@@ -37,7 +37,9 @@ const Register = () => {
     
     const passwordStrength = getPasswordStrength(password);
 
-    const isRecruiter = searchParams.get('type') === 'recruiter';
+    const typeParam = searchParams.get('type');
+    const isStudent = typeParam === 'student';
+    const isRecruiter = typeParam === 'recruiter';
 
     const handleEmailRegister = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -120,6 +122,69 @@ const Register = () => {
             setIsLoading(false);
         }
     };
+
+    if (!isStudent && !isRecruiter) {
+        return (
+            <div className="relative min-h-screen pt-24 pb-12 flex flex-col justify-center sm:px-6 lg:px-8 bg-slate-50 dark:bg-[#0b0f19] transition-colors duration-300 overflow-hidden">
+                {/* Clean Flat Background */}
+                <div className="absolute inset-0 pointer-events-none z-0" />
+
+                <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    <div className="flex justify-center mb-6">
+                        <div className="bg-slate-200 dark:bg-slate-800 p-3 rounded-2xl">
+                            <Briefcase className="w-8 h-8 text-slate-850 dark:text-white" />
+                        </div>
+                    </div>
+                    <h2 className="mt-2 text-center text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                        Create your account
+                    </h2>
+                    <p className="mt-2 text-center text-sm text-slate-600 dark:text-slate-400">
+                        Choose your account type to get started
+                    </p>
+                </div>
+
+                <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-md relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
+                    <div className="glass-card py-10 px-6 sm:px-10">
+                        <div className="space-y-5">
+                            <Link to="/register?type=student" className="relative block w-full">
+                                <div className="relative flex items-center p-5 border border-slate-200 dark:border-slate-800 hover:border-brand-500 rounded-xl transition-all bg-white dark:bg-slate-900">
+                                    <div className="flex items-center gap-5 relative z-10">
+                                        <div className="p-3.5 bg-brand-500/10 text-brand-400 rounded-xl transition-all duration-300">
+                                            <User className="w-7 h-7" />
+                                        </div>
+                                        <div className="text-left">
+                                            <h3 className="font-bold text-slate-900 dark:text-white text-lg">Student</h3>
+                                            <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5">Build experience with real-world projects</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Link>
+
+                            <Link to="/register?type=recruiter" className="relative block w-full">
+                                <div className="relative flex items-center p-5 border border-slate-200 dark:border-slate-800 hover:border-purple-500 rounded-xl transition-all bg-white dark:bg-slate-900">
+                                    <div className="flex items-center gap-5 relative z-10">
+                                        <div className="p-3.5 bg-purple-500/10 text-purple-400 rounded-xl transition-all duration-300">
+                                            <Briefcase className="w-7 h-7" />
+                                        </div>
+                                        <div className="text-left">
+                                            <h3 className="font-bold text-slate-900 dark:text-white text-lg">Recruiter</h3>
+                                            <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5">Find top talent through live projects</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Link>
+                        </div>
+                    </div>
+                    <div className="mt-8 text-center text-sm text-slate-600 dark:text-slate-400">
+                        Already have an account?{' '}
+                        <Link to="/login" className="font-semibold text-brand-600 hover:text-brand-500 transition-colors">
+                            Sign in
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="relative min-h-screen pt-24 pb-12 flex flex-col justify-center sm:px-6 lg:px-8 bg-slate-50 dark:bg-[#0b0f19] transition-colors duration-300 overflow-hidden">

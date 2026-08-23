@@ -287,7 +287,7 @@ const Login = () => {
                 </div>
                 <div className="mt-8 text-center text-sm text-slate-600 dark:text-slate-400">
                     Don't have an account?{' '}
-                    <Link to="/register" className="font-semibold text-brand-600 hover:text-brand-500 transition-colors">
+                    <Link to={`/register?type=${type === 'recruiter' ? 'recruiter' : 'student'}`} className="font-semibold text-brand-600 hover:text-brand-500 transition-colors">
                         Register for free
                     </Link>
                 </div>
