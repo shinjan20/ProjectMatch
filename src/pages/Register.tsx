@@ -122,29 +122,20 @@ const Register = () => {
     };
 
     return (
-        <div className="relative min-h-screen pt-24 pb-12 flex flex-col justify-center sm:px-6 lg:px-8 bg-slate-50 dark:bg-[#030712] transition-colors duration-500 overflow-hidden">
-            {/* Animated Mesh Background Splashes */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-brand-500/20 dark:bg-brand-500/10 blur-[120px] animate-blob mix-blend-multiply dark:mix-blend-screen"></div>
-                <div className="absolute top-[20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-purple-500/20 dark:bg-purple-500/10 blur-[120px] animate-blob animation-delay-2000 mix-blend-multiply dark:mix-blend-screen"></div>
-                <div className="absolute bottom-[-20%] left-[20%] w-[50%] h-[50%] rounded-full bg-blue-500/20 dark:bg-blue-500/10 blur-[120px] animate-blob animation-delay-4000 mix-blend-multiply dark:mix-blend-screen"></div>
-                {/* Noise texture overlay for texture */}
-                <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] mix-blend-overlay" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }}></div>
-            </div>
+        <div className="relative min-h-screen pt-24 pb-12 flex flex-col justify-center sm:px-6 lg:px-8 bg-slate-50 dark:bg-[#0b0f19] transition-colors duration-300 overflow-hidden">
+            {/* Clean Flat Background */}
+            <div className="absolute inset-0 pointer-events-none z-0" />
 
             <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <div className="flex justify-center mb-8">
                     <Link to="/" className="flex items-center gap-2 group">
-                        <div className="bg-gradient-to-br from-brand-500 to-purple-600 p-3 rounded-2xl shadow-xl shadow-brand-500/20 group-hover:shadow-brand-500/40 group-hover:scale-105 transition-all duration-300">
-                            <Briefcase className="w-8 h-8 text-white" />
-                        </div>
+                    <div className="bg-slate-200 dark:bg-slate-800 p-3 rounded-2xl">
+                        <Briefcase className="w-8 h-8 text-slate-850 dark:text-white" />
+                    </div>
                     </Link>
                 </div>
-                <h2 className="mt-2 text-center text-3xl md:text-4xl font-extrabold font-heading tracking-tight text-slate-900 dark:text-white">
-                    {isRecruiter ? 'Join as a ' : 'Join as a '}
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-purple-500 dark:from-brand-400 dark:to-purple-400">
-                        {isRecruiter ? 'Recruiter' : 'Student'}
-                    </span>
+                <h2 className="mt-2 text-center text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                    Join as a <span className="text-brand-600 dark:text-brand-400">{isRecruiter ? 'Recruiter' : 'Student'}</span>
                 </h2>
                 <p className="mt-3 text-center text-base text-slate-600 dark:text-slate-400">
                     {isRecruiter ? 'Find top talent through live projects' : 'Build experience with real-world projects'}
@@ -153,8 +144,7 @@ const Register = () => {
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-md relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
                 <div className="glass-card py-8 px-6 sm:px-10 relative overflow-hidden">
-                    {/* Decorative blob */}
-                    <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 rounded-full bg-brand-500/10 blur-2xl"></div>
+                    {/* No decorative blobs */}
 
                     <ProfanityWarningModal error={error} onClose={() => setError('')} />
                     {error && (
@@ -183,7 +173,7 @@ const Register = () => {
                                             required
                                             value={name}
                                             onChange={(e) => setName(e.target.value)}
-                                            className="block w-full pl-11 pr-4 py-3.5 border border-slate-300 dark:border-slate-700 rounded-2xl bg-white/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:bg-white dark:focus:bg-slate-950 transition-all input-interactive"
+                                            className="block w-full pl-11 pr-4 py-3.5 border border-slate-300 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all"
                                             placeholder="John Doe"
                                         />
                                     </div>
@@ -206,7 +196,7 @@ const Register = () => {
                                                     required={isRecruiter}
                                                     value={companyName}
                                                     onChange={(e) => setCompanyName(e.target.value)}
-                                                    className="block w-full pl-11 pr-4 py-3.5 border border-slate-300 dark:border-slate-700 rounded-2xl bg-white/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:bg-white dark:focus:bg-slate-950 transition-all input-interactive"
+                                                    className="block w-full pl-11 pr-4 py-3.5 border border-slate-300 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all"
                                                     placeholder="Acme Corp"
                                                 />
                                             </div>
@@ -226,7 +216,7 @@ const Register = () => {
                                                     required={isRecruiter}
                                                     value={companyWebsite}
                                                     onChange={(e) => setCompanyWebsite(e.target.value)}
-                                                    className="block w-full pl-11 pr-4 py-3.5 border border-slate-300 dark:border-slate-700 rounded-2xl bg-white/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:bg-white dark:focus:bg-slate-950 transition-all input-interactive"
+                                                    className="block w-full pl-11 pr-4 py-3.5 border border-slate-300 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all"
                                                     placeholder="https://acme.com"
                                                 />
                                             </div>
@@ -250,7 +240,7 @@ const Register = () => {
                                             required
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
-                                            className="block w-full pl-11 pr-4 py-3.5 border border-slate-300 dark:border-slate-700 rounded-2xl bg-white/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:bg-white dark:focus:bg-slate-950 transition-all input-interactive"
+                                            className="block w-full pl-11 pr-4 py-3.5 border border-slate-300 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all"
                                             placeholder="you@example.com"
                                         />
                                     </div>
@@ -272,7 +262,7 @@ const Register = () => {
                                             required
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
-                                            className="block w-full pl-11 pr-4 py-3.5 border border-slate-300 dark:border-slate-700 rounded-2xl bg-white/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:bg-white dark:focus:bg-slate-950 transition-all input-interactive"
+                                            className="block w-full pl-11 pr-4 py-3.5 border border-slate-300 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all"
                                             placeholder="••••••••"
                                         />
                                     </div>
@@ -315,7 +305,7 @@ const Register = () => {
                                 disabled={isLoading}
                                 className="relative w-full flex justify-center py-3.5 px-4 rounded-2xl shadow-md shadow-brand-500/20 text-white font-bold text-base focus:outline-none overflow-hidden group/btn bg-brand-600 disabled:opacity-70 disabled:cursor-not-allowed"
                             >
-                                <div className="absolute inset-0 bg-gradient-to-r from-brand-600 to-purple-600 opacity-100 group-hover/btn:opacity-90 transition-opacity"></div>
+                                <div className="absolute inset-0 bg-brand-600 hover:bg-brand-500 transition-colors"></div>
                                 <span className="absolute w-0 h-0 transition-all duration-500 ease-out bg-white rounded-full group-hover/btn:w-56 group-hover/btn:h-56 opacity-10 blur-xl"></span>
                                 <span className="relative flex items-center gap-2">
                                     {isLoading ? (
@@ -362,7 +352,7 @@ const Register = () => {
                                 <button
                                     onClick={handleGoogleRegister}
                                     disabled={isLoading}
-                                    className="w-full flex items-center justify-center gap-3 px-4 py-3.5 border border-slate-300 dark:border-slate-700 rounded-2xl shadow-sm bg-white dark:bg-[#0f172a]/50 hover:bg-slate-50 dark:hover:bg-[#1e293b]/80 text-sm font-medium text-slate-700 dark:text-white transition-all disabled:opacity-70 disabled:cursor-not-allowed group"
+                                    className="w-full flex items-center justify-center gap-3 px-4 py-3.5 border border-slate-300 dark:border-slate-750 rounded-2xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-medium text-slate-700 dark:text-white transition-all disabled:opacity-70 disabled:cursor-not-allowed"
                                 >
                                     <svg className="h-5 w-5 group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
                                         <path

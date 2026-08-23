@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Briefcase, MapPin, Clock, Users, FileText, Download, GraduationCap } from 'lucide-react';
+import { X, Briefcase, MapPin, Clock, Users, FileText, Download } from 'lucide-react';
 import type { StudentProfile } from './StudentProfileCard';
 import ApplicantReviewView from './ApplicantReviewView';
 import WorkingCandidateView from './WorkingCandidateView';
@@ -39,7 +39,7 @@ const ProjectDashboard = ({ isOpen, onClose, project, onArchive, onAcceptCandida
     const renderCandidateList = (candidates: StudentProfile[], emptyMessage: string, isWorkingList: boolean = false) => {
         if (!candidates || candidates.length === 0) {
             return (
-                <div className="text-center py-12 bg-slate-50 dark:bg-slate-800/20 rounded-2xl border border-slate-200 dark:border-slate-800">
+                <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
                     <Users className="mx-auto h-12 w-12 text-slate-400 mb-3" />
                     <h3 className="text-sm font-medium text-slate-900 dark:text-white">{emptyMessage}</h3>
                 </div>
@@ -47,50 +47,72 @@ const ProjectDashboard = ({ isOpen, onClose, project, onArchive, onAcceptCandida
         }
 
         return (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {candidates.map((candidate: any) => (
-                    <div
-                        key={candidate.id}
-                        className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center sm:items-start gap-4 hover:-translate-y-1 hover:border-brand-500/50 hover:shadow-lg cursor-pointer transition-all duration-300 animate-in fade-in zoom-in-95"
-                        onClick={() => {
-                            if (isWorkingList) {
-                                setReviewingWorkingCandidate(candidate);
-                            } else {
-                                setReviewingCandidate(candidate);
-                            }
-                        }}
-                    >
-                        {candidate.photoUrl ? (
-                            <img src={candidate.photoUrl} alt={candidate.name} className="w-16 h-16 rounded-full object-cover shrink-0" />
-                        ) : (
-                            <div className="w-16 h-16 rounded-full bg-brand-500/10 flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold shrink-0">
-                                {candidate.name.charAt(0)}
-                            </div>
-                        )}
-                        <div className="text-center sm:text-left flex-1 min-w-0">
-                            <h4 className="font-bold text-slate-900 dark:text-white truncate">{candidate.name}</h4>
-                            <p className="text-xs text-brand-600 dark:text-brand-400 font-medium truncate">{candidate.domain}</p>
-                            <p className="text-xs text-slate-500 flex items-center justify-center sm:justify-start gap-1 mt-1 truncate">
-                                <GraduationCap className="w-3.5 h-3.5 shrink-0" /> {candidate.college}
-                            </p>
-                            <div className="mt-2 flex items-center gap-2">
-                                <div className="text-xs font-semibold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 inline-block px-2 py-1 rounded-md">
-                                    {candidate.completedProjects} Projects Completed
-                                </div>
-                                {candidate.applicationStatus === 'accepted' && (
-                                    <span className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-bold px-2 py-1 rounded-md text-[10px] uppercase tracking-wider">
-                                        Accepted
-                                    </span>
-                                )}
-                                {candidate.applicationStatus === 'rejected' && (
-                                    <span className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 font-bold px-2 py-1 rounded-md text-[10px] uppercase tracking-wider">
-                                        Rejected
-                                    </span>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                ))}
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+                <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800 text-left text-sm">
+                        <thead className="bg-slate-50 dark:bg-slate-855/50 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                            <tr>
+                                <th scope="col" className="px-6 py-4">Candidate</th>
+                                <th scope="col" className="px-6 py-4">College</th>
+                                <th scope="col" className="px-6 py-4">Domain</th>
+                                <th scope="col" className="px-6 py-4 text-center">Completed</th>
+                                <th scope="col" className="px-6 py-4 text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-900">
+                            {candidates.map((candidate: any) => (
+                                <tr
+                                    key={candidate.id}
+                                    className="hover:bg-slate-50 dark:hover:bg-slate-800/40 cursor-pointer transition-colors"
+                                    onClick={() => {
+                                        if (isWorkingList) {
+                                            setReviewingWorkingCandidate(candidate);
+                                        } else {
+                                            setReviewingCandidate(candidate);
+                                        }
+                                    }}
+                                >
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="flex items-center gap-3">
+                                            {candidate.photoUrl ? (
+                                                <img src={candidate.photoUrl} alt={candidate.name} className="w-9 h-9 rounded-full object-cover bg-slate-100" />
+                                            ) : (
+                                                <div className="w-9 h-9 rounded-full bg-brand-500/10 text-brand-600 dark:text-brand-400 font-bold flex items-center justify-center">
+                                                    {candidate.name.charAt(0)}
+                                                </div>
+                                            )}
+                                            <span className="font-semibold text-slate-900 dark:text-white">{candidate.name}</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-400">
+                                        {candidate.college}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-brand-600 dark:text-brand-400 font-medium">
+                                        {candidate.domain}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-center text-slate-700 dark:text-slate-300 font-bold">
+                                        {candidate.completedProjects} Projects
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                                        {candidate.applicationStatus === 'accepted' ? (
+                                            <span className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-bold px-2 py-1 rounded-md text-[10px] uppercase tracking-wider">
+                                                Accepted
+                                            </span>
+                                        ) : candidate.applicationStatus === 'rejected' ? (
+                                            <span className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 font-bold px-2 py-1 rounded-md text-[10px] uppercase tracking-wider">
+                                                Rejected
+                                            </span>
+                                        ) : (
+                                            <span className="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 font-bold px-2 py-1 rounded-md text-[10px] uppercase tracking-wider">
+                                                Pending
+                                            </span>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         );
     };

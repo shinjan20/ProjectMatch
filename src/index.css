@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
-  --font-heading: 'Chakra Petch', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
 
   --color-brand-50: #eef2ff;
   --color-brand-100: #e0e7ff;
@@ -32,7 +32,7 @@
   /* Dark mode preferences */
   @media (prefers-color-scheme: dark) {
     body {
-      @apply bg-[#030712] text-slate-50;
+      @apply bg-[#0b0f19] text-slate-50;
     }
   }
 
@@ -57,84 +57,42 @@
 
 @layer utilities {
   .glass {
-    @apply bg-white/40 dark:bg-[#030712]/50 backdrop-blur-2xl shadow-2xl;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow:
-      0 8px 32px 0 rgba(31, 38, 135, 0.15),
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
+    @apply bg-white/90 dark:bg-[#111827]/90 backdrop-blur-md shadow-sm;
+    border: 1px solid rgba(0, 0, 0, 0.08);
   }
 
   @media (prefers-color-scheme: dark) {
     .glass {
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow:
-        0 8px 32px 0 rgba(0, 0, 0, 0.6),
-        inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
   }
 
   .glass-card {
-    @apply bg-white/70 dark:bg-[#0f172a]/70 backdrop-blur-xl rounded-2xl transition-all duration-500 relative overflow-hidden;
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    box-shadow:
-      0 4px 6px -1px rgba(31, 38, 135, 0.05),
-      0 10px 15px -3px rgba(31, 38, 135, 0.1),
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+    @apply bg-white dark:bg-[#111827] rounded-xl transition-all duration-300 relative overflow-hidden;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
   }
 
   @media (prefers-color-scheme: dark) {
     .glass-card {
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow:
-        0 4px 6px -1px rgba(0, 0, 0, 0.3),
-        0 10px 15px -3px rgba(0, 0, 0, 0.4),
-        inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
   }
 
-  .glass-card::before {
-    content: '';
-    @apply absolute inset-0 opacity-0 transition-opacity duration-500 bg-gradient-to-br from-brand-500/5 to-purple-500/5 pointer-events-none;
-  }
-
   .glass-card:hover {
-    @apply shadow-2xl shadow-brand-500/10 dark:shadow-brand-500/20 border-brand-300/50 dark:border-brand-500/30 -translate-y-1;
-  }
-
-  .glass-card:hover::before {
-    @apply opacity-100;
+    @apply border-slate-300 dark:border-slate-700 shadow-md;
   }
 
   .btn-interactive {
-    @apply transition-all duration-300 active:scale-[0.95] hover:shadow-xl hover:shadow-brand-500/20 hover:-translate-y-1 relative overflow-hidden;
-  }
-
-  /* Sweep shine effect on hover */
-  .btn-interactive::before {
-    content: '';
-    @apply absolute top-0 left-0 w-[150%] h-full bg-gradient-to-r from-transparent via-white/20 dark:via-white/10 to-transparent -translate-x-[150%] skew-x-[-20deg] transition-all duration-[600ms] pointer-events-none z-10;
-  }
-
-  .btn-interactive:hover::before {
-    @apply translate-x-[100%];
-  }
-
-  /* Bloom ring effect on click */
-  .btn-interactive::after {
-    content: '';
-    @apply absolute inset-0 rounded-[inherit] ring-0 ring-brand-500/0 transition-all duration-300 pointer-events-none z-0;
-  }
-
-  .btn-interactive:active::after {
-    @apply ring-4 ring-brand-500/30 duration-0;
+    @apply transition-all duration-200 active:opacity-90;
   }
 
   .interactive-glow:hover {
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+    box-shadow: none;
   }
 
   .input-interactive {
-    @apply transition-all duration-300 focus:-translate-y-0.5 focus:shadow-md;
+    @apply transition-all duration-200 focus:shadow-sm;
   }
 
   @keyframes scroll {
@@ -150,14 +108,6 @@
   @keyframes blob {
     0% {
       transform: translate(0px, 0px) scale(1);
-    }
-
-    33% {
-      transform: translate(30px, -50px) scale(1.1);
-    }
-
-    66% {
-      transform: translate(-20px, 20px) scale(0.9);
     }
 
     100% {
@@ -180,7 +130,7 @@
   }
 
   .animate-scroll {
-    animation: scroll 30s linear infinite;
+    animation: scroll 40s linear infinite;
   }
 
   .animate-scroll:hover {
@@ -188,86 +138,27 @@
   }
 
   .animate-blob {
-    animation: blob 7s infinite alternate;
+    animation: none;
   }
 
   .animate-gradient {
     background-size: 200% 200%;
-    animation: gradient 8s ease infinite;
+    animation: none;
   }
 }
 
 .bg-mesh {
-  background-color: #030712;
-  background-image:
-    radial-gradient(at 0% 0%, hsla(253, 100%, 65%, 0.15) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, hsla(285, 100%, 64%, 0.15) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, hsla(196, 100%, 53%, 0.15) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, hsla(253, 100%, 65%, 0.15) 0px, transparent 50%);
-  animation: bg-mesh-anim 15s ease infinite alternate;
+  @apply bg-slate-50 dark:bg-[#0b0f19];
 }
 
-@keyframes bg-mesh-anim {
-  0% {
-    background-image:
-      radial-gradient(at 0% 0%, hsla(253, 100%, 65%, 0.2) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, hsla(285, 100%, 64%, 0.15) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, hsla(196, 100%, 53%, 0.15) 0px, transparent 50%),
-      radial-gradient(at 0% 100%, hsla(253, 100%, 65%, 0.2) 0px, transparent 50%);
-  }
-
-  50% {
-    background-image:
-      radial-gradient(at 20% 20%, hsla(253, 100%, 65%, 0.15) 0px, transparent 50%),
-      radial-gradient(at 80% 20%, hsla(285, 100%, 64%, 0.2) 0px, transparent 50%),
-      radial-gradient(at 80% 80%, hsla(196, 100%, 53%, 0.2) 0px, transparent 50%),
-      radial-gradient(at 20% 80%, hsla(253, 100%, 65%, 0.15) 0px, transparent 50%);
-  }
-
-  100% {
-    background-image:
-      radial-gradient(at 0% 0%, hsla(253, 100%, 65%, 0.15) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, hsla(285, 100%, 64%, 0.15) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, hsla(196, 100%, 53%, 0.2) 0px, transparent 50%),
-      radial-gradient(at 0% 100%, hsla(253, 100%, 65%, 0.2) 0px, transparent 50%);
-  }
-}
-
-/* Animated Border Utilities */
+/* Animated Border Utilities (Simplified to flat borders) */
 .animated-border-badge {
   position: relative;
-  background-clip: padding-box;
-  border: solid 1px transparent;
+  border: solid 1px rgba(0, 0, 0, 0.08);
 }
 
-.animated-border-badge::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: -1;
-  margin: -1px;
-  /* same as border width */
-  border-radius: inherit;
-  /* same as border-radius */
-  background: conic-gradient(from var(--angle, 0deg), #4f46e5, #ec4899, #8b5cf6, #4f46e5);
-  animation: spin-angle 3s linear infinite;
-}
-
-@property --angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
-}
-
-@keyframes spin-angle {
-  from {
-    --angle: 0deg;
-  }
-
-  to {
-    --angle: 360deg;
+@media (prefers-color-scheme: dark) {
+  .animated-border-badge {
+    border: solid 1px rgba(255, 255, 255, 0.08);
   }
 }

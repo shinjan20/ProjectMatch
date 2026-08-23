@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Send, Link as LinkIcon, AlertCircle, Sparkles, Activity } from 'lucide-react';
+import { X, Send, Link as LinkIcon, AlertCircle, Sparkles } from 'lucide-react';
 import { MOCK_PROJECTS } from '../../constants';
 import { checkFormForProfanityAsync } from '../../utils/profanityFilter';
 import ProfanityWarningModal from '../ProfanityWarningModal';
@@ -227,30 +227,27 @@ export default function ApplicationModal({ isOpen, onClose, projectId, project: 
                                 )}
 
                                 {matchScore !== null && (
-                                    <div className="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/10 dark:to-purple-900/10 border border-indigo-100 dark:border-indigo-800/30 rounded-xl">
+                                    <div className="p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
                                         <div className="flex items-start justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <div className={`flex items-center justify-center w-12 h-12 rounded-full font-bold text-lg shadow-sm border ${
-                                                    matchScore >= 80 ? 'bg-green-100 border-green-200 text-green-700 dark:bg-green-900/30 dark:border-green-800 dark:text-green-400' :
-                                                    matchScore >= 50 ? 'bg-amber-100 border-amber-200 text-amber-700 dark:bg-amber-900/30 dark:border-amber-800 dark:text-amber-400' :
-                                                    'bg-red-100 border-red-200 text-red-700 dark:bg-red-900/30 dark:border-red-800 dark:text-red-400'
-                                                }`}>
-                                                    {matchScore}%
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <span className={`text-xs font-bold px-2 py-0.5 rounded ${
+                                                        matchScore >= 80 ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400' :
+                                                        matchScore >= 50 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400' :
+                                                        'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'
+                                                    }`}>
+                                                        {matchScore}% Match
+                                                    </span>
+                                                    <span className="text-xs text-slate-500 font-medium">AI Feedback Helper</span>
                                                 </div>
-                                                <div>
-                                                    <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                                                        <Activity className="w-4 h-4 text-indigo-500" />
-                                                        Profile Match Score
-                                                    </h4>
-                                                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
-                                                        {matchFeedback}
-                                                    </p>
-                                                </div>
+                                                <p className="text-xs text-slate-600 dark:text-slate-350 leading-relaxed">
+                                                    {matchFeedback}
+                                                </p>
                                             </div>
                                             <button
                                                 type="button"
                                                 onClick={handleCalculateScore}
-                                                className="text-[10px] font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 underline"
+                                                className="text-[10px] font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 underline shrink-0 ml-3"
                                             >
                                                 Recalculate
                                             </button>

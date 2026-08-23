@@ -62,15 +62,9 @@ const Login = () => {
 
     if (!type) {
         return (
-            <div className="relative min-h-screen pt-24 pb-12 flex flex-col justify-center sm:px-6 lg:px-8 bg-slate-50 dark:bg-[#030712] transition-colors duration-500 overflow-hidden">
-                {/* Animated Mesh Background Splashes */}
-                <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-                    <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-brand-500/20 dark:bg-brand-500/10 blur-[120px] animate-blob mix-blend-multiply dark:mix-blend-screen"></div>
-                    <div className="absolute top-[20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-purple-500/20 dark:bg-purple-500/10 blur-[120px] animate-blob animation-delay-2000 mix-blend-multiply dark:mix-blend-screen"></div>
-                    <div className="absolute bottom-[-20%] left-[20%] w-[50%] h-[50%] rounded-full bg-blue-500/20 dark:bg-blue-500/10 blur-[120px] animate-blob animation-delay-4000 mix-blend-multiply dark:mix-blend-screen"></div>
-                    {/* Noise texture overlay for texture */}
-                    <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] mix-blend-overlay" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }}></div>
-                </div>
+            <div className="relative min-h-screen pt-24 pb-12 flex flex-col justify-center sm:px-6 lg:px-8 bg-slate-50 dark:bg-[#0b0f19] transition-colors duration-300 overflow-hidden">
+                {/* Clean Flat Background */}
+                <div className="absolute inset-0 pointer-events-none z-0" />
 
                 <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
                     <div className="flex justify-center mb-8">
@@ -91,12 +85,10 @@ const Login = () => {
                 <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-md relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
                     <div className="glass-card py-10 px-6 sm:px-10">
                         <div className="space-y-5">
-                            <Link to="/login?type=student" className="relative group block w-full">
-                                <div className="absolute inset-0 bg-brand-500/20 rounded-[1.25rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                                <div className="relative flex items-center p-5 border border-slate-200 dark:border-white/10 hover:border-brand-500/50 rounded-[1.25rem] transition-all bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-md overflow-hidden">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-brand-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            <Link to="/login?type=student" className="relative block w-full">
+                                <div className="relative flex items-center p-5 border border-slate-200 dark:border-slate-800 hover:border-brand-500 rounded-xl transition-all bg-white dark:bg-slate-900">
                                     <div className="flex items-center gap-5 relative z-10">
-                                        <div className="p-3.5 bg-brand-500/10 text-brand-400 rounded-xl group-hover:scale-110 group-hover:bg-brand-500/20 transition-all duration-300">
+                                        <div className="p-3.5 bg-brand-500/10 text-brand-400 rounded-xl group-hover:scale-105 transition-all duration-300">
                                             <GraduationCap className="w-7 h-7" />
                                         </div>
                                         <div className="text-left">
@@ -107,12 +99,10 @@ const Login = () => {
                                 </div>
                             </Link>
 
-                            <Link to="/login?type=recruiter" className="relative group block w-full">
-                                <div className="absolute inset-0 bg-purple-500/20 rounded-[1.25rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                                <div className="relative flex items-center p-5 border border-slate-200 dark:border-white/10 hover:border-purple-500/50 rounded-[1.25rem] transition-all bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-md overflow-hidden">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            <Link to="/login?type=recruiter" className="relative block w-full">
+                                <div className="relative flex items-center p-5 border border-slate-200 dark:border-slate-800 hover:border-purple-500 rounded-xl transition-all bg-white dark:bg-slate-900">
                                     <div className="flex items-center gap-5 relative z-10">
-                                        <div className="p-3.5 bg-purple-500/10 text-purple-400 rounded-xl group-hover:scale-110 group-hover:bg-purple-500/20 transition-all duration-300">
+                                        <div className="p-3.5 bg-purple-500/10 text-purple-400 rounded-xl group-hover:scale-105 transition-all duration-300">
                                             <Briefcase className="w-7 h-7" />
                                         </div>
                                         <div className="text-left">
@@ -136,15 +126,9 @@ const Login = () => {
     }
 
     return (
-        <div className="relative min-h-screen pt-24 pb-12 flex flex-col justify-center sm:px-6 lg:px-8 bg-slate-50 dark:bg-[#030712] transition-colors duration-500 overflow-hidden">
-            {/* Animated Mesh Background Splashes */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-brand-500/20 dark:bg-brand-500/10 blur-[120px] animate-blob mix-blend-multiply dark:mix-blend-screen"></div>
-                <div className="absolute top-[20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-purple-500/20 dark:bg-purple-500/10 blur-[120px] animate-blob animation-delay-2000 mix-blend-multiply dark:mix-blend-screen"></div>
-                <div className="absolute bottom-[-20%] left-[20%] w-[50%] h-[50%] rounded-full bg-blue-500/20 dark:bg-blue-500/10 blur-[120px] animate-blob animation-delay-4000 mix-blend-multiply dark:mix-blend-screen"></div>
-                {/* Noise texture overlay for texture */}
-                <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] mix-blend-overlay" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }}></div>
-            </div>
+        <div className="relative min-h-screen pt-24 pb-12 flex flex-col justify-center sm:px-6 lg:px-8 bg-slate-50 dark:bg-[#0b0f19] transition-colors duration-300 overflow-hidden">
+            {/* Clean Flat Background */}
+            <div className="absolute inset-0 pointer-events-none z-0" />
 
             <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <div className="flex justify-center mb-6">
@@ -167,8 +151,7 @@ const Login = () => {
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="glass-card py-10 px-6 sm:px-10 relative overflow-hidden">
 
-                    {/* Decorative blob */}
-                    <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 rounded-full bg-brand-500/10 blur-2xl"></div>
+                    {/* No decorative blobs */}
 
                     {error && (
                         <div className="mb-4 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-xl flex items-start gap-3">
@@ -195,7 +178,7 @@ const Login = () => {
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="block w-full pl-10 pr-3 py-3 border border-slate-300 dark:border-slate-700 rounded-xl bg-white/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all input-interactive"
+                                    className="block w-full pl-10 pr-3 py-3 border border-slate-300 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all"
                                     placeholder="you@example.com"
                                 />
                             </div>
@@ -217,7 +200,7 @@ const Login = () => {
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="block w-full pl-10 pr-3 py-3 border border-slate-300 dark:border-slate-700 rounded-xl bg-white/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all input-interactive"
+                                    className="block w-full pl-10 pr-3 py-3 border border-slate-300 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all"
                                     placeholder="••••••••"
                                 />
                             </div>

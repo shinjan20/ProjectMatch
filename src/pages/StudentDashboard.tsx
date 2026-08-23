@@ -424,12 +424,12 @@ export default function StudentDashboard() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 
                 {/*  --- NEW: Welcome Analytics Card --- */}
-                <div className="mb-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-700/50 rounded-[2rem] p-8 shadow-xl shadow-brand-500/5">
+                <div className="mb-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-805 rounded-2xl p-8 shadow-sm">
                     <div className="flex flex-col md:flex-row gap-8 items-start md:items-center justify-between">
                         
                         <div className="flex-1">
-                            <h1 className="text-3xl md:text-5xl font-heading font-black tracking-tight text-slate-900 dark:text-white mb-3">
-                                Welcome back, <span className="text-brand-500">{userName}</span>
+                            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-3">
+                                Welcome back, <span className="text-brand-600 dark:text-brand-400">{userName}</span>
                             </h1>
                             <p className="text-slate-600 dark:text-slate-400 text-lg">
                                 Ready to take the next step in your career? Here is your current standing today.
@@ -437,16 +437,16 @@ export default function StudentDashboard() {
                         </div>
 
                         {/* Profile Completion Mini-Widget */}
-                        <div className="w-full md:w-72 bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-5 border border-slate-200 dark:border-slate-700">
+                        <div className="w-full md:w-72 bg-slate-50 dark:bg-slate-800/50 rounded-xl p-5 border border-slate-200 dark:border-slate-700">
                             <div className="flex justify-between items-center mb-2">
                                 <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Profile Strength</span>
-                                <span className="text-sm font-black text-brand-600 dark:text-brand-400">80%</span>
+                                <span className="text-sm font-bold text-brand-600 dark:text-brand-400">80%</span>
                             </div>
                             <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mb-3">
-                                <div className="h-full bg-gradient-to-r from-brand-500 to-purple-500 w-[80%] rounded-full shadow-[0_0_10px_rgba(139,92,246,0.5)]"></div>
+                                <div className="h-full bg-brand-500 w-[80%] rounded-full"></div>
                             </div>
                             <p className="text-xs text-slate-500 dark:text-slate-400">
-                                You are <span className="font-semibold text-slate-700 dark:text-slate-300">20%</span> away from being an All-Star. Uploading a resume highly increases selection rates!
+                                You are <span className="font-semibold text-slate-750 dark:text-slate-200">20%</span> away from being an All-Star. Uploading a resume highly increases selection rates!
                             </p>
                         </div>
                     </div>
