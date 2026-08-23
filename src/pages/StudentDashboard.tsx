@@ -38,6 +38,10 @@ export default function StudentDashboard() {
     const [threads, setThreads] = useState<any[]>([]);
 
     useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [activeTab]);
+
+    useEffect(() => {
         let isMounted = true;
 
         const fetchThreads = async () => {

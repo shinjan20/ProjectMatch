@@ -32,6 +32,10 @@ const RecruiterDashboard = () => {
 
     // Fetch projects and their applications from Supabase
     useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [activeTab]);
+
+    useEffect(() => {
         const fetchRecruiterData = async () => {
             if (!userId) return;
 

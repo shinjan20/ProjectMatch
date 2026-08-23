@@ -80,6 +80,10 @@ const Projects = () => {
     const [liveProjects, setLiveProjects] = useState<any[]>([]);
 
     useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [selectedCategory, searchTerm, activeFilters]);
+
+    useEffect(() => {
         const fetchUserData = async () => {
             if (userRole === 'student' && userId) {
                 // Fetch applied projects
