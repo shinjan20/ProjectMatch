@@ -44,12 +44,16 @@ const Projects = () => {
 
     // Advanced Filters State
     const [isFiltersModalOpen, setIsFiltersModalOpen] = useState(false);
+    const [sortBy, setSortBy] = useState<'newest' | 'match' | 'deadline'>('newest');
     const [activeFilters, setActiveFilters] = useState({
         duration: [] as string[],
         stipend: '',
         skills: [] as string[],
         workType: [] as string[],
-        showBookmarkedOnly: initialBookmarkFilter
+        showBookmarkedOnly: initialBookmarkFilter,
+        difficulty: '',
+        weeklyCommitment: '',
+        deadline: ''
     });
 
     // Application Modal State
@@ -128,6 +132,7 @@ const Projects = () => {
                         status,
                         created_at,
                         recruiter:profiles!projects_recruiter_id_fkey (
+                            id,
                             company_name
                         )
                     `)
@@ -147,19 +152,38 @@ const Projects = () => {
                 });
 
                 if (projectsData) {
-                    const formatted = projectsData.map((p: any) => ({
-                        id: p.id,
-                        title: p.role,
-                        company: p.recruiter?.company_name || 'Company',
-                        category: p.domain,
-                        type: 'Remote', // Hardcoded for now
-                        duration: p.tenure + ' months',
-                        remuneration: p.remuneration,
-                        totalPositions: p.positions || 1,
-                        hiredPositions: hiredCounts[p.id] || 0,
-                        postedAt: p.created_at,
-                        tags: [p.domain],
-                    }));
+                    const formatted = projectsData.map((p: any) => {
+                        let difficulty = 'Intermediate';
+                        if (Number(p.remuneration) === 0) difficulty = 'Beginner';
+                        else if (Number(p.remuneration) >= 20000) difficulty = 'Advanced';
+
+                        let commitment = '10-20 hrs/week';
+                        if (p.tenure <= 1) commitment = '< 10 hrs/week';
+                        else if (p.tenure >= 4) commitment = '20+ hrs/week';
+
+                        const createdTime = new Date(p.created_at).getTime();
+                        const deadlineTime = createdTime + 30 * 24 * 60 * 60 * 1000;
+                        const daysLeft = Math.max(1, Math.ceil((deadlineTime - Date.now()) / (1000 * 60 * 60 * 24)));
+
+                        return {
+                            id: p.id,
+                            title: p.role,
+                            company: p.recruiter?.company_name || 'Company',
+                            recruiterId: p.recruiter?.id,
+                            category: p.domain,
+                            type: 'Remote', // Hardcoded for now
+                            duration: p.tenure + ' months',
+                            remuneration: p.remuneration,
+                            totalPositions: p.positions || 1,
+                            hiredPositions: hiredCounts[p.id] || 0,
+                            postedAt: p.created_at,
+                            tags: [p.domain],
+                            difficulty,
+                            commitment,
+                            daysLeft,
+                            deadlineDate: new Date(deadlineTime).toLocaleDateString()
+                        };
+                    });
                     setLiveProjects(formatted);
                 }
             } catch (err) {
@@ -243,18 +267,54 @@ const Projects = () => {
             matchesAdvanced = matchesAdvanced && activeFilters.workType.includes(project.type);
         }
         if (activeFilters.skills.length > 0) {
-            // Check if project has all the selected skills
             matchesAdvanced = matchesAdvanced && activeFilters.skills.every(skill => project.tags.includes(skill));
         }
         if (activeFilters.stipend !== '') {
             matchesAdvanced = matchesAdvanced && Number(project.remuneration) >= Number(activeFilters.stipend);
         }
-
         if (activeFilters.showBookmarkedOnly) {
             matchesAdvanced = matchesAdvanced && bookmarkedProjectIds.includes(project.id);
         }
+        if (activeFilters.difficulty !== '') {
+            matchesAdvanced = matchesAdvanced && project.difficulty === activeFilters.difficulty;
+        }
+        if (activeFilters.weeklyCommitment !== '') {
+            matchesAdvanced = matchesAdvanced && project.commitment === activeFilters.weeklyCommitment;
+        }
+        if (activeFilters.deadline !== '') {
+            const limit = activeFilters.deadline.includes('7') ? 7 : 30;
+            matchesAdvanced = matchesAdvanced && project.daysLeft <= limit;
+        }
 
         return matchesSearch && matchesCategory && matchesAdvanced;
+    });
+
+    // Heuristic AI Matching Score
+    const getMatchScore = (project: any) => {
+        let score = 55;
+        const studentDomain = localStorage.getItem('studentDomain') || '';
+        const studentSkillsRaw = localStorage.getItem('studentSkills');
+        const studentSkills = studentSkillsRaw ? JSON.parse(studentSkillsRaw) : [];
+
+        if (project.category === studentDomain) score += 20;
+        project.tags.forEach((tag: string) => {
+            if (studentSkills.includes(tag)) score += 10;
+        });
+
+        return Math.min(score, 98);
+    };
+
+    const sortedProjects = [...filteredProjects].sort((a, b) => {
+        if (sortBy === 'newest') {
+            return new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime();
+        }
+        if (sortBy === 'deadline') {
+            return a.daysLeft - b.daysLeft;
+        }
+        if (sortBy === 'match') {
+            return getMatchScore(b) - getMatchScore(a);
+        }
+        return 0;
     });
 
     return (
@@ -308,12 +368,24 @@ const Projects = () => {
                                     {category}
                                 </button>
                             ))}
+                            <div className="flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full px-3.5 py-1.5 ml-2">
+                                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Sort By:</span>
+                                <select
+                                    value={sortBy}
+                                    onChange={(e) => setSortBy(e.target.value as any)}
+                                    className="text-xs font-bold text-slate-700 dark:text-slate-300 bg-transparent border-none outline-none focus:ring-0 cursor-pointer"
+                                >
+                                    <option value="newest">Newest</option>
+                                    {userRole === 'student' && <option value="match">Best Match</option>}
+                                    <option value="deadline">Closing Soon</option>
+                                </select>
+                            </div>
                             <button
                                 onClick={() => setIsFiltersModalOpen(true)}
                                 className="flex items-center gap-2 px-4 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-full text-sm font-medium transition-all shadow-xl shadow-slate-900/10 btn-interactive ml-2 relative"
                             >
                                 <Filter className="w-4 h-4" /> Filters
-                                {(activeFilters.duration.length > 0 || activeFilters.stipend !== '' || activeFilters.skills.length > 0 || activeFilters.workType.length > 0 || activeFilters.showBookmarkedOnly) && (
+                                {(activeFilters.duration.length > 0 || activeFilters.stipend !== '' || activeFilters.skills.length > 0 || activeFilters.workType.length > 0 || activeFilters.showBookmarkedOnly || activeFilters.difficulty !== '' || activeFilters.weeklyCommitment !== '' || activeFilters.deadline !== '') && (
                                     <span className="absolute -top-1 -right-1 w-3 h-3 bg-brand-500 border-2 border-slate-900 dark:border-white rounded-full"></span>
                                 )}
                             </button>
@@ -327,20 +399,23 @@ const Projects = () => {
                     <div className="absolute inset-0 bg-brand-500/5 dark:bg-brand-500/10 blur-[100px] rounded-full opacity-0 group-hover/grid:opacity-100 transition-opacity duration-1000 pointer-events-none"></div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
-                        {filteredProjects.length > 0 ? (
-                            filteredProjects.map((project) => (
+                        {sortedProjects.length > 0 ? (
+                            sortedProjects.map((project) => (
                                 <div
                                     key={project.id}
                                     onClick={() => setViewingProjectId(project.id)}
                                     className="glass-card p-4 sm:p-6 flex flex-col group/card cursor-pointer hover:border-brand-500/50"
                                 >
                                     <div className="mb-5 flex items-start justify-between">
-                                        <div className="relative">
-                                            {/* Neon subtle backdrop for category */}
-                                            <div className="absolute inset-0 bg-brand-500/20 blur-md rounded-full -z-10 group-hover/card:bg-brand-500/40 transition-colors"></div>
-                                            <span className="inline-flex px-3 py-1 rounded-full border border-brand-500/30 bg-brand-500/10 text-brand-700 dark:text-brand-300 text-xs font-bold tracking-widest uppercase shadow-[0_0_10px_rgba(99,102,241,0.1)]">
+                                        <div className="flex flex-wrap gap-2 items-center">
+                                            <span className="inline-flex px-3 py-1 rounded-full border border-brand-500/30 bg-brand-500/10 text-brand-700 dark:text-brand-300 text-xs font-bold tracking-widest uppercase">
                                                 {project.category}
                                             </span>
+                                            {userRole === 'student' && (
+                                                <span className="inline-flex px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-wider border border-emerald-200/50 dark:border-emerald-900/30">
+                                                    ★ Fit: {getMatchScore(project)}%
+                                                </span>
+                                            )}
                                         </div>
                                         {userRole !== 'recruiter' && (
                                             <button
@@ -365,7 +440,15 @@ const Projects = () => {
                                             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center font-bold text-sm text-slate-500 border border-slate-200 dark:border-slate-800 shadow-inner">
                                                 {project.company.charAt(0)}
                                             </div>
-                                            <span className="text-slate-600 dark:text-slate-400 font-semibold text-sm">
+                                            <span
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    if (project.recruiterId) {
+                                                        navigate(`/company/${project.recruiterId}`);
+                                                    }
+                                                }}
+                                                className="text-slate-600 dark:text-slate-400 font-semibold text-sm hover:text-brand-600 dark:hover:text-brand-400 hover:underline cursor-pointer transition-colors"
+                                            >
                                                 {project.company}
                                             </span>
                                         </div>

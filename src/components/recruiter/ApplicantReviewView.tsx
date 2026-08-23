@@ -1,4 +1,4 @@
-import { X, CheckCircle, XCircle, FileText, User, Github, Linkedin, GraduationCap } from 'lucide-react';
+import { X, FileText, User, Github, Linkedin, GraduationCap } from 'lucide-react';
 import type { StudentProfile } from './StudentProfileCard';
 
 interface ApplicantReviewViewProps {
@@ -8,9 +8,10 @@ interface ApplicantReviewViewProps {
     onDecline: (candidateId: string) => void;
     isArchived?: boolean;
     onRevert?: (candidateId: string) => void;
+    onUpdateStage?: (candidateId: string, stage: string) => void;
 }
 
-const ApplicantReviewView = ({ candidate, onClose, onAccept, onDecline, isArchived = false, onRevert }: ApplicantReviewViewProps) => {
+const ApplicantReviewView = ({ candidate, onClose, onAccept, onDecline, isArchived: _isArchived = false, onRevert: _onRevert, onUpdateStage }: ApplicantReviewViewProps) => {
     return (
         <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-lg mt-4 animate-in fade-in zoom-in-95 duration-200">
             {/* Header */}
@@ -74,41 +75,52 @@ const ApplicantReviewView = ({ candidate, onClose, onAccept, onDecline, isArchiv
                     </div>
 
                     {/* Application Info / Cover Letter */}
-                    <div className="w-full md:w-2/3 md:pl-6 md:border-l md:border-slate-200 md:dark:border-slate-800">
-                        <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-3">Cover Letter Note</h4>
-                        <div className="bg-white dark:bg-slate-800/80 p-5 rounded-xl border border-slate-200 dark:border-slate-700/80 prose prose-slate dark:prose-invert max-w-none text-sm text-slate-600 dark:text-slate-300 shadow-sm whitespace-pre-line leading-relaxed">
-                            {`Hi there,\n\nI am extremely interested in this role. I have previously completed ${candidate.completedProjects} project${candidate.completedProjects === 1 ? '' : 's'} related to ${candidate.domain}. My background at ${candidate.college} has prepared me well for the expectations listed in your project description.\n\nPlease find my resume attached. I am eager to discuss this further with you!\n\nBest regards,\n${candidate.name}`}
+                    <div className="w-full md:w-2/3 md:pl-6 md:border-l md:border-slate-200 md:dark:border-slate-800 flex flex-col justify-between">
+                        <div>
+                            <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-3">Cover Letter Note</h4>
+                            <div className="bg-white dark:bg-slate-800/80 p-5 rounded-xl border border-slate-200 dark:border-slate-700/80 prose prose-slate dark:prose-invert max-w-none text-sm text-slate-650 dark:text-slate-300 shadow-sm whitespace-pre-line leading-relaxed mb-6">
+                                {`Hi there,\n\nI am extremely interested in this role. I have previously completed ${candidate.completedProjects} project${candidate.completedProjects === 1 ? '' : 's'} related to ${candidate.domain}. My background at ${candidate.college} has prepared me well for the expectations listed in your project description.\n\nPlease find my resume attached. I am eager to discuss this further with you!\n\nBest regards,\n${candidate.name}`}
+                            </div>
                         </div>
 
-                        {/* Decision Actions */}
-                        <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 flex gap-4">
-                            {isArchived ? (
-                                <button
-                                    onClick={() => onRevert && onRevert(candidate.id)}
-                                    className="flex-1 py-3 flex items-center justify-center gap-2 text-white bg-slate-700 hover:bg-slate-600 rounded-xl transition-colors shadow-md font-bold btn-interactive"
-                                >
-                                    Revert to Applicant Pool
-                                </button>
-                            ) : (candidate as any).applicationStatus === 'accepted' ? (
-                                <div className="flex-1 py-3 flex items-center justify-center gap-2 text-green-700 bg-green-50 border border-green-200 dark:bg-green-900/20 dark:border-green-800 dark:text-green-400 rounded-xl font-bold cursor-not-allowed">
-                                    <CheckCircle className="w-5 h-5" /> Accepted
-                                </div>
-                            ) : (
-                                <>
-                                    <button
-                                        onClick={() => onDecline(candidate.id)}
-                                        className="flex-1 py-3 flex items-center justify-center gap-2 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-red-600 dark:hover:text-red-400 transition-colors font-bold btn-interactive"
-                                    >
-                                        <XCircle className="w-5 h-5" /> Decline
-                                    </button>
-                                    <button
-                                        onClick={() => onAccept(candidate.id)}
-                                        className="flex-1 py-3 flex items-center justify-center gap-2 text-white bg-brand-600 rounded-xl hover:bg-brand-500 transition-colors shadow-md shadow-brand-500/20 font-bold btn-interactive"
-                                    >
-                                        <CheckCircle className="w-5 h-5" /> Accept Candidate
-                                    </button>
-                                </>
-                            )}
+                        {/* Pipeline Stage Select Panel */}
+                        <div className="pt-6 border-t border-slate-200 dark:border-slate-800">
+                            <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-3">Recruitment Funnel Stage</h4>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                {[
+                                    { status: 'pending', label: 'New', color: 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600' },
+                                    { status: 'reviewing', label: 'Reviewing', color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800' },
+                                    { status: 'shortlisted', label: 'Shortlisted', color: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800' },
+                                    { status: 'interview', label: 'Interview', color: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800' },
+                                    { status: 'final_review', label: 'Final Review', color: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-800' },
+                                    { status: 'accepted', label: 'Hired', color: 'bg-green-600 text-white border-green-600' },
+                                    { status: 'rejected', label: 'Declined', color: 'bg-red-655 text-white border-red-655' }
+                                ].map(item => {
+                                    const currentStatus = (candidate as any).applicationStatus || 'pending';
+                                    const isCurrent = currentStatus === item.status;
+                                    
+                                    return (
+                                        <button
+                                            key={item.status}
+                                            onClick={() => {
+                                                if (onUpdateStage) {
+                                                    onUpdateStage(candidate.id, item.status);
+                                                } else {
+                                                    if (item.status === 'accepted') onAccept(candidate.id);
+                                                    else if (item.status === 'rejected') onDecline(candidate.id);
+                                                }
+                                            }}
+                                            className={`px-3 py-2 border rounded-xl text-xs font-bold text-center transition-all ${
+                                                isCurrent 
+                                                    ? `${item.color} shadow-sm ring-2 ring-brand-500/20`
+                                                    : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-slate-350 dark:hover:border-slate-700'
+                                            }`}
+                                        >
+                                            {item.label}
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
                 </div>

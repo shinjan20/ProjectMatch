@@ -14,6 +14,7 @@ import CompletedProjects from './pages/CompletedProjects';
 import AuthCallback from './pages/AuthCallback';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import CompanyProfile from './pages/CompanyProfile';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
@@ -59,6 +60,7 @@ function App() {
               <Route path="/dashboard/student" element={<ProtectedStudentRoute><StudentDashboard /></ProtectedStudentRoute>} />
               <Route path="/completed-projects" element={<ProtectedStudentRoute><CompletedProjects /></ProtectedStudentRoute>} />
               <Route path="/dashboard/recruiter" element={<RecruiterDashboard />} />
+              <Route path="/company/:companyId" element={<CompanyProfile />} />
               <Route path="/settings" element={<Settings />} />
 
               {/* Catch-all route for unknown paths */}

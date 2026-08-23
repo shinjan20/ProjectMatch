@@ -10,6 +10,9 @@ interface ProjectFiltersModalProps {
         skills: string[];
         workType: string[];
         showBookmarkedOnly: boolean;
+        difficulty: string;
+        weeklyCommitment: string;
+        deadline: string;
     };
     onFiltersChange: (newFilters: any) => void;
 }
@@ -20,6 +23,9 @@ const AVAILABLE_SKILLS = [
 
 const WORK_TYPES = ['WFH', 'WFO', 'Hybrid'];
 const DURATIONS = ['1 month', '2 months', '3 months', '6 months'];
+const DIFFICULTIES = ['Beginner', 'Intermediate', 'Advanced'];
+const COMMITMENTS = ['< 10 hrs/week', '10-20 hrs/week', '20+ hrs/week'];
+const DEADLINES = ['Closing soon (7 days)', 'Closing soon (30 days)'];
 
 export default function ProjectFiltersModal({ isOpen, onClose, filters, onFiltersChange }: ProjectFiltersModalProps) {
     if (!isOpen) return null;
@@ -51,7 +57,10 @@ export default function ProjectFiltersModal({ isOpen, onClose, filters, onFilter
             stipend: '',
             skills: [],
             workType: [],
-            showBookmarkedOnly: false
+            showBookmarkedOnly: false,
+            difficulty: '',
+            weeklyCommitment: '',
+            deadline: ''
         });
     };
 
@@ -184,6 +193,69 @@ export default function ProjectFiltersModal({ isOpen, onClose, filters, onFilter
                                         }`}
                                 >
                                     {skill}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Difficulty */}
+                    <div>
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center mb-3">
+                            <SlidersHorizontal className="w-4 h-4 mr-2 text-slate-400" /> Difficulty Level
+                        </h3>
+                        <div className="flex flex-wrap gap-2">
+                            {DIFFICULTIES.map(diff => (
+                                <button
+                                    key={diff}
+                                    onClick={() => onFiltersChange({ ...filters, difficulty: filters.difficulty === diff ? '' : diff })}
+                                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${filters.difficulty === diff
+                                            ? 'bg-brand-500 text-white shadow-md shadow-brand-500/20 border border-transparent'
+                                            : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-brand-500/50'
+                                        }`}
+                                >
+                                    {diff}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Weekly Commitment */}
+                    <div>
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center mb-3">
+                            <Clock className="w-4 h-4 mr-2 text-slate-400" /> Weekly Commitment
+                        </h3>
+                        <div className="flex flex-wrap gap-2">
+                            {COMMITMENTS.map(comm => (
+                                <button
+                                    key={comm}
+                                    onClick={() => onFiltersChange({ ...filters, weeklyCommitment: filters.weeklyCommitment === comm ? '' : comm })}
+                                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${filters.weeklyCommitment === comm
+                                            ? 'bg-brand-500 text-white shadow-md shadow-brand-500/20 border border-transparent'
+                                            : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-brand-500/50'
+                                        }`}
+                                >
+                                    {comm}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Application Deadline */}
+                    <div>
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center mb-3">
+                            <Clock className="w-4 h-4 mr-2 text-slate-400" /> Application Deadline
+                        </h3>
+                        <div className="flex flex-wrap gap-2">
+                            {DEADLINES.map(dead => (
+                                <button
+                                    key={dead}
+                                    onClick={() => onFiltersChange({ ...filters, deadline: filters.deadline === dead ? '' : dead })}
+                                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${filters.deadline === dead
+                                            ? 'bg-brand-500 text-white shadow-md shadow-brand-500/20 border border-transparent'
+                                            : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-brand-500/50'
+                                        }`}
+                                >
+                                    {dead}
                                 </button>
                             ))}
                         </div>

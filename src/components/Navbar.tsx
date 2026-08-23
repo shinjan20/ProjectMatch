@@ -1,8 +1,10 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Briefcase, Menu, X, LogOut, User as UserIcon, Settings as SettingsIcon, MoreHorizontal, Check, XCircle, CheckCircle2 } from 'lucide-react';
+import { Briefcase, Menu, X, LogOut, User as UserIcon, Settings as SettingsIcon, MoreHorizontal, Check, XCircle, CheckCircle2, Bell } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useInterviewStatus } from '../hooks/useInterviewStatus';
+import { useNotifications } from '../hooks/useNotifications';
+import NotificationCenter from './NotificationCenter';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -11,6 +13,18 @@ const Navbar = () => {
     const [lastScrollY, setLastScrollY] = useState(0);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [showStatusMenu, setShowStatusMenu] = useState(false);
+    const [showNotificationCenter, setShowNotificationCenter] = useState(false);
+    const { unreadCount } = useNotifications();
+    const [_, setTick] = useState(0);
+
+    useEffect(() => {
+        const handleUpdate = () => {
+            setTick(prev => prev + 1);
+        };
+        window.addEventListener('pm_notifications_updated', handleUpdate);
+        return () => window.removeEventListener('pm_notifications_updated', handleUpdate);
+    }, []);
+
     const { userRole, userName, userPhoto, isAuthenticated, logout } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
@@ -176,6 +190,30 @@ const Navbar = () => {
                                             </button>
                                         </div>
                                     )}
+                                </div>
+                            )}
+                            {isAuthenticated && (
+                                <div className="relative mr-2">
+                                    <button
+                                        onClick={() => {
+                                            setShowNotificationCenter(!showNotificationCenter);
+                                            setShowProfileMenu(false);
+                                            setShowStatusMenu(false);
+                                        }}
+                                        className="relative p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-850/50 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
+                                        aria-label="Notification center"
+                                    >
+                                        <Bell className="w-5 h-5" />
+                                        {unreadCount > 0 && (
+                                            <span className="absolute top-1 right-1 w-4 h-4 bg-brand-650 text-[9px] font-black text-white flex items-center justify-center rounded-full border border-white dark:border-slate-900">
+                                                {unreadCount}
+                                            </span>
+                                        )}
+                                    </button>
+                                    <NotificationCenter
+                                        isOpen={showNotificationCenter}
+                                        onClose={() => setShowNotificationCenter(false)}
+                                    />
                                 </div>
                             )}
                             {isAuthenticated ? (

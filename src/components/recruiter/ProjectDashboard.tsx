@@ -15,10 +15,11 @@ interface ProjectDashboardProps {
     onSendLetter?: (projectId: string, candidateId: string, type: 'joining' | 'completion', content: string) => void;
     onCompleteProject?: (projectId: string, candidateId: string) => void;
     onRevertCandidate?: (projectId: string, candidateId: string) => void;
+    onUpdateCandidateStage?: (projectId: string, candidateId: string, stage: string) => void;
     initialTab?: 'details' | 'applicants' | 'archived' | 'working';
 }
 
-const ProjectDashboard = ({ isOpen, onClose, project, onArchive, onAcceptCandidate, onDeclineCandidate, onMessageWorkingCandidate, onSendLetter, onCompleteProject, onRevertCandidate, initialTab = 'details' }: ProjectDashboardProps) => {
+const ProjectDashboard = ({ isOpen, onClose, project, onArchive, onAcceptCandidate, onDeclineCandidate, onMessageWorkingCandidate, onSendLetter, onCompleteProject, onRevertCandidate, onUpdateCandidateStage, initialTab = 'details' }: ProjectDashboardProps) => {
     const [activeTab, setActiveTab] = useState<'details' | 'applicants' | 'archived' | 'working'>(initialTab);
     const [reviewingCandidate, setReviewingCandidate] = useState<StudentProfile | null>(null);
     const [reviewingWorkingCandidate, setReviewingWorkingCandidate] = useState<StudentProfile | null>(null);
@@ -258,6 +259,10 @@ const ProjectDashboard = ({ isOpen, onClose, project, onArchive, onAcceptCandida
                                 isArchived={activeTab === 'archived'}
                                 onRevert={(id) => {
                                     if (onRevertCandidate) onRevertCandidate(project.id, id);
+                                    setReviewingCandidate(null);
+                                }}
+                                onUpdateStage={(id, stage) => {
+                                    if (onUpdateCandidateStage) onUpdateCandidateStage(project.id, id, stage);
                                     setReviewingCandidate(null);
                                 }}
                             />
