@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Briefcase, MapPin, Clock, Users, FileText, Download } from 'lucide-react';
+import { X, Briefcase, MapPin, Clock, Users, FileText, Download, CheckSquare, Square, GitCompare, ChevronRight } from 'lucide-react';
 import type { StudentProfile } from './StudentProfileCard';
 import ApplicantReviewView from './ApplicantReviewView';
 import WorkingCandidateView from './WorkingCandidateView';
@@ -23,6 +23,16 @@ const ProjectDashboard = ({ isOpen, onClose, project, onArchive, onAcceptCandida
     const [activeTab, setActiveTab] = useState<'details' | 'applicants' | 'archived' | 'working'>(initialTab);
     const [reviewingCandidate, setReviewingCandidate] = useState<StudentProfile | null>(null);
     const [reviewingWorkingCandidate, setReviewingWorkingCandidate] = useState<StudentProfile | null>(null);
+    const [compareIds, setCompareIds] = useState<string[]>([]);
+    const [showCompareModal, setShowCompareModal] = useState(false);
+
+    const toggleCompare = (id: string) => {
+        setCompareIds(prev =>
+            prev.includes(id)
+                ? prev.filter(c => c !== id)
+                : prev.length < 3 ? [...prev, id] : prev
+        );
+    };
 
     useEffect(() => {
         if (isOpen) {
@@ -33,6 +43,8 @@ const ProjectDashboard = ({ isOpen, onClose, project, onArchive, onAcceptCandida
     const resetViews = () => {
         setReviewingCandidate(null);
         setReviewingWorkingCandidate(null);
+        setCompareIds([]);
+        setShowCompareModal(false);
     };
 
     if (!isOpen || !project) return null;
@@ -50,9 +62,10 @@ const ProjectDashboard = ({ isOpen, onClose, project, onArchive, onAcceptCandida
         return (
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800 text-left text-sm">
-                        <thead className="bg-slate-50 dark:bg-slate-855/50 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                    <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800 text-left text-sm font-sans">
+                        <thead className="bg-slate-50 dark:bg-slate-800/50 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                             <tr>
+                                <th scope="col" className="px-4 py-4 w-10"><span className="sr-only">Compare</span></th>
                                 <th scope="col" className="px-6 py-4">Candidate</th>
                                 <th scope="col" className="px-6 py-4">College</th>
                                 <th scope="col" className="px-6 py-4">Domain</th>
@@ -64,16 +77,28 @@ const ProjectDashboard = ({ isOpen, onClose, project, onArchive, onAcceptCandida
                             {candidates.map((candidate: any) => (
                                 <tr
                                     key={candidate.id}
-                                    className="hover:bg-slate-50 dark:hover:bg-slate-800/40 cursor-pointer transition-colors"
-                                    onClick={() => {
-                                        if (isWorkingList) {
-                                            setReviewingWorkingCandidate(candidate);
-                                        } else {
-                                            setReviewingCandidate(candidate);
-                                        }
-                                    }}
+                                    className={`hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors ${
+                                        compareIds.includes(candidate.id) ? 'bg-brand-50/60 dark:bg-brand-900/10' : ''
+                                    }`}
                                 >
-                                    <td className="px-6 py-4 whitespace-nowrap">
+                                    {/* Compare checkbox */}
+                                    <td className="px-4 py-4" onClick={e => e.stopPropagation()}>
+                                        <button
+                                            onClick={() => toggleCompare(candidate.id)}
+                                            className={`p-1 rounded transition-colors ${
+                                                compareIds.includes(candidate.id)
+                                                    ? 'text-brand-600 dark:text-brand-400'
+                                                    : 'text-slate-300 dark:text-slate-600 hover:text-slate-500'
+                                            }`}
+                                            title={compareIds.includes(candidate.id) ? 'Remove from comparison' : compareIds.length >= 3 ? 'Max 3 candidates' : 'Add to comparison'}
+                                        >
+                                            {compareIds.includes(candidate.id)
+                                                ? <CheckSquare className="w-4 h-4" />
+                                                : <Square className="w-4 h-4" />
+                                            }
+                                        </button>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap cursor-pointer" onClick={() => isWorkingList ? setReviewingWorkingCandidate(candidate) : setReviewingCandidate(candidate)}>
                                         <div className="flex items-center gap-3">
                                             {candidate.photoUrl ? (
                                                 <img src={candidate.photoUrl} alt={candidate.name} className="w-9 h-9 rounded-full object-cover bg-slate-100" />
@@ -85,34 +110,110 @@ const ProjectDashboard = ({ isOpen, onClose, project, onArchive, onAcceptCandida
                                             <span className="font-semibold text-slate-900 dark:text-white">{candidate.name}</span>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-400">
+                                    <td className="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-400 cursor-pointer" onClick={() => isWorkingList ? setReviewingWorkingCandidate(candidate) : setReviewingCandidate(candidate)}>
                                         {candidate.college}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-brand-600 dark:text-brand-400 font-medium">
+                                    <td className="px-6 py-4 whitespace-nowrap text-brand-600 dark:text-brand-400 font-medium cursor-pointer" onClick={() => isWorkingList ? setReviewingWorkingCandidate(candidate) : setReviewingCandidate(candidate)}>
                                         {candidate.domain}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-center text-slate-700 dark:text-slate-300 font-bold">
+                                    <td className="px-6 py-4 whitespace-nowrap text-center text-slate-700 dark:text-slate-300 font-bold cursor-pointer" onClick={() => isWorkingList ? setReviewingWorkingCandidate(candidate) : setReviewingCandidate(candidate)}>
                                         {candidate.completedProjects} Projects
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                                    <td className="px-6 py-4 whitespace-nowrap text-center cursor-pointer" onClick={() => isWorkingList ? setReviewingWorkingCandidate(candidate) : setReviewingCandidate(candidate)}>
                                         {candidate.applicationStatus === 'accepted' ? (
-                                            <span className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-bold px-2 py-1 rounded-md text-[10px] uppercase tracking-wider">
-                                                Accepted
-                                            </span>
+                                            <span className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-bold px-2 py-1 rounded-md text-[10px] uppercase tracking-wider">Accepted</span>
                                         ) : candidate.applicationStatus === 'rejected' ? (
-                                            <span className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 font-bold px-2 py-1 rounded-md text-[10px] uppercase tracking-wider">
-                                                Rejected
-                                            </span>
+                                            <span className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 font-bold px-2 py-1 rounded-md text-[10px] uppercase tracking-wider">Rejected</span>
                                         ) : (
-                                            <span className="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 font-bold px-2 py-1 rounded-md text-[10px] uppercase tracking-wider">
-                                                Pending
-                                            </span>
+                                            <span className="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 font-bold px-2 py-1 rounded-md text-[10px] uppercase tracking-wider">Pending</span>
                                         )}
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
+                </div>
+            </div>
+        );
+    };
+
+    /* ============================================================
+       COMPARISON MODAL — side-by-side view of up to 3 candidates
+       ============================================================ */
+    const renderCompareModal = () => {
+        const allCandidates = [
+            ...(project.appliedCandidates || []),
+            ...(project.workingCandidates || []),
+            ...(project.archivedCandidates || []),
+        ];
+        const selected = allCandidates.filter((c: any) => compareIds.includes(c.id));
+        if (!showCompareModal || selected.length < 2) return null;
+
+        return (
+            <div
+                className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm"
+                onClick={() => setShowCompareModal(false)}
+            >
+                <div
+                    className="bg-white dark:bg-slate-900 w-full max-w-5xl rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden"
+                    onClick={e => e.stopPropagation()}
+                >
+                    <div className="flex items-center justify-between px-8 py-5 border-b border-slate-200 dark:border-slate-800">
+                        <div className="flex items-center gap-3">
+                            <GitCompare className="w-5 h-5 text-brand-600" />
+                            <h2 className="text-lg font-bold font-heading text-slate-900 dark:text-white">Candidate Comparison</h2>
+                            <span className="text-xs font-semibold text-slate-500">{selected.length} candidates selected</span>
+                        </div>
+                        <button onClick={() => setShowCompareModal(false)} className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
+                    <div className={`grid grid-cols-${selected.length} gap-0 divide-x divide-slate-200 dark:divide-slate-800`}>
+                        {selected.map((c: any) => (
+                            <div key={c.id} className="p-6 space-y-5">
+                                {/* Header */}
+                                <div className="flex flex-col items-center text-center gap-3">
+                                    <div className="w-14 h-14 rounded-2xl bg-brand-500/10 text-brand-600 dark:text-brand-400 text-xl font-black flex items-center justify-center">
+                                        {c.name?.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-slate-900 dark:text-white font-heading">{c.name}</p>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{c.college}</p>
+                                    </div>
+                                </div>
+                                {/* Key metrics */}
+                                <div className="space-y-2 text-sm">
+                                    <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+                                        <span className="text-slate-500 font-medium">Domain</span>
+                                        <span className="text-brand-600 dark:text-brand-400 font-semibold">{c.domain}</span>
+                                    </div>
+                                    <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+                                        <span className="text-slate-500 font-medium">Projects Done</span>
+                                        <span className="font-bold text-slate-900 dark:text-white">{c.completedProjects}</span>
+                                    </div>
+                                    <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+                                        <span className="text-slate-500 font-medium">AI Match</span>
+                                        <span className="font-bold text-slate-900 dark:text-white">{c.aiMatchScore ?? '—'}%</span>
+                                    </div>
+                                    <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+                                        <span className="text-slate-500 font-medium">Status</span>
+                                        <span className="font-semibold capitalize text-slate-700 dark:text-slate-300">{c.applicationStatus ?? 'pending'}</span>
+                                    </div>
+                                </div>
+                                {/* Skills */}
+                                {c.skills && c.skills.length > 0 && (
+                                    <div>
+                                        <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">Skills</p>
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {c.skills.slice(0, 6).map((s: string) => (
+                                                <span key={s} className="text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded">{s}</span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
         );
@@ -368,6 +469,31 @@ const ProjectDashboard = ({ isOpen, onClose, project, onArchive, onAcceptCandida
                     )}
                 </div>
             </div>
+
+            {/* Floating Comparison Tray — appears when 2+ candidates are selected */}
+            {compareIds.length >= 2 && !showCompareModal && (
+                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[55] animate-in slide-in-from-bottom-4 fade-in duration-300">
+                    <div className="flex items-center gap-4 bg-slate-900 dark:bg-slate-800 text-white px-6 py-3.5 rounded-2xl shadow-2xl border border-slate-700">
+                        <GitCompare className="w-4 h-4 text-brand-400 shrink-0" />
+                        <span className="text-sm font-semibold">{compareIds.length} candidates selected</span>
+                        <button
+                            onClick={() => setShowCompareModal(true)}
+                            className="flex items-center gap-1.5 px-4 py-1.5 bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold rounded-xl transition-colors"
+                        >
+                            Compare Side-by-Side <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                            onClick={() => setCompareIds([])}
+                            className="p-1.5 hover:bg-slate-700 rounded-lg transition-colors text-slate-400 hover:text-white"
+                        >
+                            <X className="w-3.5 h-3.5" />
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Comparison Modal */}
+            {renderCompareModal()}
         </div>
     );
 };

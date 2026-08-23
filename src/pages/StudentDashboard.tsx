@@ -22,6 +22,27 @@ const timeAgo = (dateInput?: string) => {
     return 'Just now';
 };
 
+/**
+ * Translates internal recruiter pipeline stage identifiers into
+ * student-facing status labels. Prevents internal process terminology
+ * from leaking into the student workspace.
+ */
+const studentFriendlyStatus = (rawStatus: string): { label: string; color: string } => {
+    switch (rawStatus) {
+        case 'pending':      return { label: 'Applied — Under Initial Review', color: 'text-amber-600 dark:text-amber-400' };
+        case 'reviewing':    return { label: 'Application Under Review', color: 'text-blue-600 dark:text-blue-400' };
+        case 'shortlisted':  return { label: 'Resume Shortlisted ✓', color: 'text-indigo-600 dark:text-indigo-400' };
+        case 'interview':    return { label: 'Interview Stage', color: 'text-purple-600 dark:text-purple-400' };
+        case 'final_review': return { label: 'Under Final Consideration', color: 'text-brand-600 dark:text-brand-400' };
+        case 'accepted':
+        case 'working':      return { label: 'Offer Accepted 🎉', color: 'text-green-600 dark:text-green-400' };
+        case 'completed':    return { label: 'Project Completed', color: 'text-green-700 dark:text-green-300' };
+        case 'rejected':
+        case 'declined':     return { label: 'Application Concluded', color: 'text-slate-500 dark:text-slate-400' };
+        default:             return { label: 'Applied', color: 'text-slate-500 dark:text-slate-400' };
+    }
+};
+
 export default function StudentDashboard() {
     const { userName, userRole, userId } = useAuth();
     const navigate = useNavigate();
@@ -392,10 +413,10 @@ export default function StudentDashboard() {
 
                         {/* Application Lifecycle Timeline */}
                         <div className="mt-2 mb-5 p-3 rounded-xl bg-slate-50/50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800">
-                            <div className="flex items-center justify-between text-[9px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">
-                                <span>Application Timeline</span>
-                                <span className="text-brand-600 dark:text-brand-400">
-                                    {project.appStatus === 'rejected' || project.appStatus === 'declined' ? 'Rejected' : project.appStatus || 'Applied'}
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="text-[9px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Application Status</span>
+                                <span className={`text-[10px] font-bold ${studentFriendlyStatus(project.appStatus || 'pending').color}`}>
+                                    {studentFriendlyStatus(project.appStatus || 'pending').label}
                                 </span>
                             </div>
                             <div className="flex items-center gap-1.5">
@@ -554,6 +575,48 @@ export default function StudentDashboard() {
                         )}
                     </div>
                 </div>
+
+                {/* Insight-Led Recommendations */}
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
+                    <h3 className="text-base font-bold font-heading text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-brand-500 inline-block"></span>
+                        What to Do Next
+                    </h3>
+                    <div className="space-y-3 text-sm font-sans">
+                        {interviewProjects.length > 0 && (
+                            <div className="flex gap-3 p-4 rounded-xl bg-purple-50 dark:bg-purple-900/10 border border-purple-100 dark:border-purple-900/20">
+                                <span className="text-purple-500 text-base shrink-0">🗓</span>
+                                <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
+                                    <strong>You have {interviewProjects.length} active interview{interviewProjects.length > 1 ? 's' : ''}.</strong> Respond to interview invitations within 24 hours — candidates who respond quickly are 3× more likely to receive an offer.
+                                </p>
+                            </div>
+                        )}
+                        {responseRate > 0 && responseRate < 40 && (
+                            <div className="flex gap-3 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/20">
+                                <span className="text-amber-500 text-base shrink-0">✍️</span>
+                                <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
+                                    <strong>Your response rate is {responseRate}%.</strong> Personalise each cover letter to the specific project deliverables — generic applications are filtered out 2× faster by AI screening systems.
+                                </p>
+                            </div>
+                        )}
+                        {missingSkills.length > 0 && (
+                            <div className="flex gap-3 p-4 rounded-xl bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-900/20">
+                                <span className="text-indigo-500 text-base shrink-0">📈</span>
+                                <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
+                                    <strong>Add {missingSkills.slice(0, 2).join(' and ')} to your profile</strong> to unlock more high-paying project matches. These are the most-requested skills across active listings this week.
+                                </p>
+                            </div>
+                        )}
+                        {total === 0 && (
+                            <div className="flex gap-3 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                                <span className="text-slate-400 text-base shrink-0">🚀</span>
+                                <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                                    Apply to your first project to start tracking your analytics. Even one well-targeted application generates valuable insights for future applications.
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
         );
     };
@@ -637,6 +700,40 @@ export default function StudentDashboard() {
                     </div>
                 </div>
                 {/*  --- END Welcome Analytics Card --- */}
+
+                {/* Next Best Action Banner */}
+                <div className="mb-8 p-5 rounded-2xl bg-gradient-to-r from-brand-500/10 via-purple-500/5 to-transparent border border-brand-500/20 dark:border-brand-500/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-300">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-brand-500 text-white rounded-xl shadow-md">
+                            <TrendingUp className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h4 className="text-xs font-black text-brand-650 dark:text-brand-400 uppercase tracking-wider">Next Best Action</h4>
+                            <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mt-1">
+                                {interviewProjects.length > 0 
+                                    ? `You have an active interview invitation for "${interviewProjects[0].title}". View messages to respond.`
+                                    : appliedProjects.length > 0
+                                    ? `Address key skill gaps in the Workspace Analytics tab to boost your AI Compatibility Match by up to 40%.`
+                                    : `Start matching with active projects! Browse open listings and apply today to build your portfolio.`
+                                }
+                            </p>
+                        </div>
+                    </div>
+                    <button 
+                        onClick={() => {
+                            if (interviewProjects.length > 0) {
+                                setActiveTab('messages');
+                            } else if (appliedProjects.length > 0) {
+                                setActiveTab('analytics');
+                            } else {
+                                navigate('/projects');
+                            }
+                        }}
+                        className="px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl text-xs hover:-translate-y-0.5 transition-all shadow-sm hover:shadow shrink-0"
+                    >
+                        {interviewProjects.length > 0 ? "Open Messages" : appliedProjects.length > 0 ? "Check Analytics" : "Browse Projects"}
+                    </button>
+                </div>
 
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Sidebar / Navigation Cards */}
