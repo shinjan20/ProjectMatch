@@ -167,7 +167,7 @@ export default function StudentDashboard() {
                         cover_letter,
                         availability,
                         portfolio_url,
-                        created_at,
+                        applied_at,
                         projects (
                             id,
                             role,
@@ -214,7 +214,7 @@ export default function StudentDashboard() {
                                 coverLetter: app.cover_letter,
                                 availability: app.availability,
                                 portfolioUrl: app.portfolio_url,
-                                appliedAt: app.created_at
+                                appliedAt: app.applied_at
                             }
                         };
 
