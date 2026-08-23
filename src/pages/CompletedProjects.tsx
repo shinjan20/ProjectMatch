@@ -1,21 +1,84 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { MOCK_PROJECTS } from '../constants';
 import { CheckCircle2, FileText, Download, GraduationCap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
 
 export default function CompletedProjects() {
-    const { userRole } = useAuth();
+    const { userId, userRole } = useAuth();
     const navigate = useNavigate();
-    const [downloadingLetter, setDownloadingLetter] = useState<{ projectId: number, type: 'Certificate' | 'Completion Letter' } | null>(null);
+    const [downloadingLetter, setDownloadingLetter] = useState<{ projectId: number | string, type: 'Certificate' | 'Completion Letter' } | null>(null);
+    const [dbProjects, setDbProjects] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-    // Filter out only completed mock projects for demonstration
-    const completedProjects = [MOCK_PROJECTS[4]];
+    useEffect(() => {
+        if (!userId || userRole !== 'student') return;
+
+        const fetchCompletedProjects = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('applications')
+                    .select(`
+                        id,
+                        status,
+                        project:projects (
+                            id,
+                            role,
+                            domain,
+                            tenure,
+                            remuneration,
+                            recruiter:profiles (
+                                name,
+                                company_name
+                            )
+                        )
+                    `)
+                    .eq('student_id', userId)
+                    .eq('status', 'completed');
+
+                if (error) throw error;
+
+                if (data) {
+                    const formatted = data.map((app: any) => {
+                        const proj = app.project;
+                        return {
+                            id: proj.id,
+                            title: proj.role,
+                            company: proj.recruiter?.company_name || proj.recruiter?.name || 'Company',
+                            duration: `${proj.tenure} Month${proj.tenure === 1 ? '' : 's'}`,
+                            type: 'Remote',
+                            category: proj.domain,
+                            remuneration: String(proj.remuneration)
+                        };
+                    });
+                    setDbProjects(formatted);
+                }
+            } catch (err) {
+                console.error('Error fetching completed projects:', err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchCompletedProjects();
+    }, [userId, userRole]);
+
+    // Use database completed projects, with fallback to mock data for demonstration
+    const completedProjects = dbProjects.length > 0 ? dbProjects : [MOCK_PROJECTS[4]];
 
     if (userRole !== 'student') {
         return (
             <div className="min-h-screen pt-32 pb-20 flex flex-col items-center justify-center">
                 <h2 className="text-2xl font-bold">Unauthorized. Students only.</h2>
+            </div>
+        );
+    }
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen pt-32 pb-20 flex flex-col items-center justify-center bg-slate-50 dark:bg-[#0b0f19]">
+                <div className="w-10 h-10 rounded-full border-4 border-slate-200 dark:border-slate-800 border-t-brand-500 animate-spin"></div>
             </div>
         );
     }
