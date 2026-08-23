@@ -409,37 +409,33 @@ const Projects = () => {
 
                                     {userRole !== 'recruiter' && (
                                         <div className="mt-auto pt-2">
-                                            {/* Subtle interactive wrapper for button */}
-                                            <div className="relative p-[1px] rounded-xl overflow-hidden group/btn">
-                                                <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)] opacity-0 group-hover/card:opacity-100 transition-opacity duration-500" />
-                                                {!isAuthenticated ? (
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); navigate('/login?returnTo=/projects'); }}
-                                                        className="relative w-full bg-slate-900/90 dark:bg-white/90 text-white dark:text-slate-900 py-3 rounded-[11px] font-semibold hover:bg-slate-800 dark:hover:bg-white transition-colors flex items-center justify-center gap-2 z-10 opacity-70 group-hover/card:opacity-100 backdrop-blur-md btn-interactive"
-                                                    >
-                                                        Login to Apply <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                                                    </button>
-                                                ) : (
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            if (!hasCompletedProfile) {
-                                                                navigate('/dashboard/student');
-                                                                return;
-                                                            }
-                                                            setApplyingProjectId(project.id);
-                                                        }}
-                                                        disabled={interviewStatus === 'closed'}
-                                                        title={interviewStatus === 'closed' ? "Your profile is closed to projects." : ""}
-                                                        className={`relative w-full text-white py-3 rounded-[11px] font-semibold transition-colors flex items-center justify-center gap-2 z-10 backdrop-blur-md ${interviewStatus === 'closed'
-                                                            ? 'bg-brand-600/50 cursor-not-allowed opacity-50 grayscale blur-[1px]'
-                                                            : 'bg-brand-600/90 hover:bg-brand-500 opacity-70 group-hover/card:opacity-100 btn-interactive'
-                                                            }`}
-                                                    >
-                                                        Apply Now <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                                                    </button>
-                                                )}
-                                            </div>
+                                            {!isAuthenticated ? (
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); navigate('/login?returnTo=/projects'); }}
+                                                    className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 py-3 rounded-xl font-semibold hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors flex items-center justify-center gap-2 btn-interactive"
+                                                >
+                                                    Login to Apply <ArrowRight className="w-4 h-4 transition-transform" />
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        if (!hasCompletedProfile) {
+                                                            navigate('/dashboard/student');
+                                                            return;
+                                                        }
+                                                        setApplyingProjectId(project.id);
+                                                    }}
+                                                    disabled={interviewStatus === 'closed'}
+                                                    title={interviewStatus === 'closed' ? "Your profile is closed to projects." : ""}
+                                                    className={`w-full text-white py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 ${interviewStatus === 'closed'
+                                                        ? 'bg-slate-200 dark:bg-slate-850 text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                                                        : 'bg-brand-600 hover:bg-brand-700 btn-interactive'
+                                                        }`}
+                                                >
+                                                    Apply Now <ArrowRight className="w-4 h-4 transition-transform" />
+                                                </button>
+                                            )}
                                         </div>
                                     )}
                                 </div>
