@@ -71,6 +71,20 @@ export default function StudentDashboard() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [activeTab]);
 
+    // Sync hash with activeTab for mobile bottom navigation support
+    useEffect(() => {
+        const handleHashChange = () => {
+            const hash = window.location.hash;
+            if (hash === '#applications') setActiveTab('applied');
+            else if (hash === '#projects') setActiveTab('ongoing');
+            else if (hash === '#messages') setActiveTab('messages');
+            else if (hash === '#analytics') setActiveTab('analytics');
+        };
+        handleHashChange();
+        window.addEventListener('hashchange', handleHashChange);
+        return () => window.removeEventListener('hashchange', handleHashChange);
+    }, []);
+
     useEffect(() => {
         let isMounted = true;
 
@@ -745,10 +759,10 @@ export default function StudentDashboard() {
                 </div>
 
                 <div className="flex flex-col lg:flex-row gap-8">
-                    {/* Sidebar / Navigation Cards */}
-                    <div className="w-full lg:w-64 flex-shrink-0 space-y-3">
+                    {/* Sidebar / Navigation Cards (Hidden on Mobile) */}
+                    <div className="hidden lg:flex flex-col w-64 flex-shrink-0 space-y-3">
                         <button
-                            onClick={() => setActiveTab('applied')}
+                            onClick={() => { setActiveTab('applied'); window.location.hash = ''; }}
                             className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all border ${activeTab === 'applied'
                                 ? 'bg-brand-600 text-white border-brand-600 shadow-md shadow-brand-500/20'
                                 : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-brand-500 text-slate-700 dark:text-slate-300'
@@ -764,7 +778,7 @@ export default function StudentDashboard() {
                         </button>
 
                         <button
-                            onClick={() => setActiveTab('interviews')}
+                            onClick={() => { setActiveTab('interviews'); window.location.hash = ''; }}
                             className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all border ${activeTab === 'interviews'
                                 ? 'bg-amber-500 text-white border-amber-500 shadow-md shadow-amber-500/20'
                                 : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-amber-500 text-slate-700 dark:text-slate-300'
@@ -780,7 +794,7 @@ export default function StudentDashboard() {
                         </button>
 
                         <button
-                            onClick={() => setActiveTab('ongoing')}
+                            onClick={() => { setActiveTab('ongoing'); window.location.hash = ''; }}
                             className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all border ${activeTab === 'ongoing'
                                 ? 'bg-green-600 text-white border-green-600 shadow-md shadow-green-500/20'
                                 : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-green-600 text-slate-700 dark:text-slate-300'
@@ -798,7 +812,7 @@ export default function StudentDashboard() {
 
 
                         <button
-                            onClick={() => setActiveTab('messages')}
+                            onClick={() => { setActiveTab('messages'); window.location.hash = ''; }}
                             className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all border ${activeTab === 'messages'
                                 ? 'bg-purple-600 text-white border-purple-600 shadow-md shadow-purple-500/20'
                                 : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-purple-600 text-slate-700 dark:text-slate-300'
@@ -814,7 +828,7 @@ export default function StudentDashboard() {
                         </button>
 
                         <button
-                            onClick={() => setActiveTab('archived')}
+                            onClick={() => { setActiveTab('archived'); window.location.hash = ''; }}
                             className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all border ${activeTab === 'archived'
                                 ? 'bg-slate-800 dark:bg-slate-700 text-white border-slate-800 dark:border-slate-700 shadow-md shadow-slate-900/20'
                                 : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-500 text-slate-700 dark:text-slate-300'
@@ -830,7 +844,7 @@ export default function StudentDashboard() {
                         </button>
 
                         <button
-                            onClick={() => setActiveTab('analytics')}
+                            onClick={() => { setActiveTab('analytics'); window.location.hash = ''; }}
                             className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all border ${activeTab === 'analytics'
                                 ? 'bg-brand-600 text-white border-brand-600 shadow-md shadow-brand-500/20'
                                 : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-brand-500 text-slate-700 dark:text-slate-300'
@@ -846,8 +860,8 @@ export default function StudentDashboard() {
                         </button>
                     </div>
 
-                    {/* Main Content Area */}
-                    <div className="flex-1">
+                    {/* Desktop Main Content Area (Hidden on Mobile unless hash is active) */}
+                    <div className="hidden lg:block flex-1">
                         <div className="mb-6 border-b border-slate-200 dark:border-slate-800 pb-4">
                             <h2 className="text-xl font-bold text-slate-900 dark:text-white capitalize flex items-center gap-2">
                                 {activeTab} Projects
@@ -868,6 +882,65 @@ export default function StudentDashboard() {
                         {activeTab === 'messages' && <StudentMessagingHub threads={threads} />}
                         {activeTab === 'archived' && renderProjectsList(archivedProjects, "None of your recent applications have been archived yet.", 'archive')}
                         {activeTab === 'analytics' && renderStudentAnalytics()}
+                    </div>
+
+                    {/* Mobile Unified Main Content Area */}
+                    <div className="block lg:hidden flex-1 space-y-8">
+                        {/* If they tapped a specific tab on the bottom nav, show only that */}
+                        {window.location.hash === '#applications' && (
+                            <div>
+                                <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">My Applications</h2>
+                                {renderProjectsList(appliedProjects, "You haven't applied to any live projects yet.", 'briefcase')}
+                            </div>
+                        )}
+                        {window.location.hash === '#projects' && (
+                            <div>
+                                <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Active Projects</h2>
+                                {renderProjectsList(ongoingProjects, "You don't have any active projects right now.", 'briefcase')}
+                            </div>
+                        )}
+                        {window.location.hash === '#messages' && (
+                            <StudentMessagingHub threads={threads} />
+                        )}
+                        {window.location.hash === '#analytics' && (
+                            renderStudentAnalytics()
+                        )}
+                        
+                        {/* If they are on the default home view (no hash), show the vertical Action-Oriented feed */}
+                        {(!window.location.hash || window.location.hash === '') && (
+                            <>
+                                {/* Action Required */}
+                                {(interviewProjects.length > 0 || ongoingProjects.length > 0) && (
+                                    <section>
+                                        <h3 className="text-lg font-bold text-brand-600 dark:text-brand-400 mb-4 flex items-center gap-2">
+                                            <CalendarCheck className="w-5 h-5" /> Action Required
+                                        </h3>
+                                        <div className="space-y-4">
+                                            {renderProjectsList(interviewProjects, "", 'briefcase')}
+                                            {renderProjectsList(ongoingProjects, "", 'briefcase')}
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* Quick Links */}
+                                <section className="grid grid-cols-2 gap-4">
+                                    <button onClick={() => window.location.hash = '#messages'} className="flex flex-col items-center justify-center p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800/50 rounded-2xl text-purple-700 dark:text-purple-400 gap-2 font-semibold">
+                                        <MessageSquare className="w-6 h-6" />
+                                        Messages
+                                    </button>
+                                    <button onClick={() => window.location.hash = '#analytics'} className="flex flex-col items-center justify-center p-4 bg-brand-50 dark:bg-brand-900/20 border border-brand-100 dark:border-brand-800/50 rounded-2xl text-brand-700 dark:text-brand-400 gap-2 font-semibold">
+                                        <TrendingUp className="w-6 h-6" />
+                                        Analytics
+                                    </button>
+                                </section>
+
+                                {/* Recent Activity */}
+                                <section>
+                                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Recent Applications</h3>
+                                    {renderProjectsList(appliedProjects.slice(0, 5), "You haven't applied to any live projects yet.", 'briefcase')}
+                                </section>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

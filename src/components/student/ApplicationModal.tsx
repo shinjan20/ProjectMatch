@@ -164,17 +164,17 @@ export default function ApplicationModal({ isOpen, onClose, projectId, project: 
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center sm:p-6">
             {/* Backdrop */}
             <div
-                className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+                className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity animate-in fade-in duration-300"
                 onClick={onClose}
             />
 
             {/* Modal Box */}
-            <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl shadow-brand-500/10 border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
+            <div className="relative w-full sm:max-w-2xl h-[100dvh] sm:h-auto bg-white dark:bg-slate-900 sm:rounded-[2rem] shadow-2xl shadow-brand-500/10 border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300 flex flex-col">
                 {/* Header */}
-                <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between sticky top-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md z-10">
+                <div className="px-6 py-4 sm:py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md">
                     <div>
                         <h2 className="text-xl font-bold font-heading text-slate-900 dark:text-white">
                             Apply to {project.company}
@@ -192,8 +192,8 @@ export default function ApplicationModal({ isOpen, onClose, projectId, project: 
                 </div>
 
                 {/* Body Form */}
-                <form noValidate onSubmit={handleSubmit}>
-                    <div className="p-6 max-h-[70vh] overflow-y-auto hide-scrollbar space-y-6">
+                <form noValidate onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden">
+                    <div className="p-6 flex-1 overflow-y-auto hide-scrollbar space-y-6 pb-24 sm:pb-6">
 
                         <div className="bg-brand-50 dark:bg-brand-500/10 border border-brand-100 dark:border-brand-500/20 rounded-xl p-4 flex items-start gap-3">
                             <AlertCircle className="w-5 h-5 text-brand-600 dark:text-brand-400 shrink-0 mt-0.5" />
@@ -339,27 +339,30 @@ export default function ApplicationModal({ isOpen, onClose, projectId, project: 
                         </div>
                     </div>
 
-                    {/* Footer Actions */}
-                    <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex justify-end gap-3 rounded-b-[2rem]">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="px-5 py-2.5 rounded-xl font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
-                        >
-                            Cancel
-                        </button>
+                    {/* Submit Button Section (Sticky on mobile bottom) */}
+                    <div className="fixed sm:static bottom-0 left-0 right-0 p-4 sm:p-6 bg-white dark:bg-slate-900 sm:bg-transparent border-t sm:border-t-0 border-slate-200 dark:border-slate-800">
                         <button
                             type="submit"
                             disabled={isSubmitting || !coverLetter || !availability}
-                            className="flex items-center gap-2 bg-brand-600 hover:bg-brand-500 text-white px-6 py-2.5 rounded-xl font-bold shadow-md shadow-brand-500/20 transition-all active:scale-95 disabled:opacity-50 disabled:active:scale-100"
+                            className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
                         >
                             {isSubmitting ? (
-                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                <>
+                                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                    Submitting...
+                                </>
                             ) : (
                                 <>
-                                    <Send className="w-4 h-4" /> Submit Application
+                                    <Send className="w-5 h-5" /> Submit Application
                                 </>
                             )}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="hidden sm:block w-full mt-2 text-sm font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                        >
+                            Cancel
                         </button>
                     </div>
                 </form>

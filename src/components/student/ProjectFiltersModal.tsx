@@ -69,17 +69,23 @@ export default function ProjectFiltersModal({ isOpen, onClose, filters, onFilter
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center sm:p-6">
             {/* Backdrop */}
             <div
-                className="fixed inset-0 bg-slate-900/40 dark:bg-slate-900/60 backdrop-blur-sm transition-opacity"
+                className="absolute inset-0 bg-slate-900/40 dark:bg-slate-900/60 backdrop-blur-sm transition-opacity animate-in fade-in duration-300"
                 onClick={onClose}
             />
 
-            {/* Modal Dialog */}
-            <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl shadow-brand-500/10 border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
+            {/* Modal / Bottom Sheet Dialog */}
+            <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-[2rem] rounded-b-none sm:rounded-b-[2rem] shadow-2xl shadow-brand-500/10 border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300 max-h-[90vh] flex flex-col">
+                
+                {/* Mobile Drag Handle */}
+                <div className="w-full flex justify-center pt-3 pb-1 sm:hidden" onClick={onClose}>
+                    <div className="w-12 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700" />
+                </div>
+
                 {/* Header */}
-                <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between sticky top-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md z-10">
+                <div className="px-6 py-4 sm:py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
                     <div className="flex items-center gap-3">
                         <div className="bg-brand-50 dark:bg-brand-500/10 p-2 rounded-xl">
                             <Filter className="w-5 h-5 text-brand-600 dark:text-brand-400" />
@@ -97,7 +103,7 @@ export default function ProjectFiltersModal({ isOpen, onClose, filters, onFilter
                 </div>
 
                 {/* Content */}
-                <div className="p-6 max-h-[70vh] overflow-y-auto hide-scrollbar space-y-8">
+                <div className="p-6 overflow-y-auto hide-scrollbar space-y-8 flex-1">
 
                     {/* Bookmarks Toggle (Unique filter feature) */}
                     <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
