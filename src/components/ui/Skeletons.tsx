@@ -1,4 +1,3 @@
-import React from 'react';
 
 export const ProjectCardSkeleton = () => (
     <div className="glass-card p-5 animate-pulse border border-slate-200/50 dark:border-slate-800/50 rounded-2xl w-full">

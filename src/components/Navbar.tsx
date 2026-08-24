@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Briefcase, Menu, X, LogOut, User as UserIcon, Settings as SettingsIcon, MoreHorizontal, Check, XCircle, CheckCircle2, Bell } from 'lucide-react';
+import { Menu, X, LogOut, User as UserIcon, Settings as SettingsIcon, MoreHorizontal, Check, XCircle, CheckCircle2, Bell } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useInterviewStatus } from '../hooks/useInterviewStatus';
@@ -97,11 +97,16 @@ const Navbar = () => {
                         to={isAuthenticated ? (userRole === 'recruiter' ? '/dashboard/recruiter' : '/projects') : '/'}
                         className="flex-shrink-0 flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity"
                     >
-                        <div className={`bg-gradient-to-r from-brand-500 to-purple-600 rounded-xl shadow-lg shadow-brand-500/20 flex items-center justify-center transition-all duration-500 ${isScrolled ? 'w-10 h-10' : 'w-12 h-12'}`}>
-                            <Briefcase className={`text-white transition-all duration-500 ${isScrolled ? 'w-5 h-5' : 'w-6 h-6'}`} />
+                        <div className={`flex items-center justify-center transition-all duration-500 ${isScrolled ? 'w-8 h-8' : 'w-10 h-10'}`}>
+                            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+                                {/* Left Chevron (Dark Navy / White in dark mode) */}
+                                <path d="M12 16 L4 8 H12 L20 16 L12 24 H4 L12 16 Z" fill="currentColor" className="text-slate-900 dark:text-white" />
+                                {/* Right Chevron (Brand Blue) */}
+                                <path d="M22 16 L14 8 H22 L30 16 L22 24 H14 L22 16 Z" fill="#4F46E5" />
+                            </svg>
                         </div>
-                        <span className={`font-heading font-extrabold tracking-tight text-slate-900 dark:text-white transition-all duration-500 ${isScrolled ? 'text-xl' : 'text-2xl md:text-3xl'}`}>
-                            ProjectMatch
+                        <span className={`font-heading tracking-tight text-slate-900 dark:text-white transition-all duration-500 ${isScrolled ? 'text-xl' : 'text-2xl md:text-3xl'}`}>
+                            <span className="font-medium">Project</span><span className="font-bold">Match</span>
                         </span>
                     </Link>
 
