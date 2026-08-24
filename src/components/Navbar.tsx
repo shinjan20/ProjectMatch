@@ -1,10 +1,12 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, LogOut, User as UserIcon, Settings as SettingsIcon, MoreHorizontal, Check, XCircle, CheckCircle2, Bell } from 'lucide-react';
+import { Menu, X, LogOut, User as UserIcon, Settings as SettingsIcon, MoreHorizontal, Check, XCircle, CheckCircle2, Bell, Sparkles } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useInterviewStatus } from '../hooks/useInterviewStatus';
 import { useNotifications } from '../hooks/useNotifications';
 import NotificationCenter from './NotificationCenter';
+import AssistantModal from './ai/AssistantModal';
+import { useKeyboardShortcut } from '../hooks/useKeyboardShortcut';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -14,7 +16,12 @@ const Navbar = () => {
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [showStatusMenu, setShowStatusMenu] = useState(false);
     const [showNotificationCenter, setShowNotificationCenter] = useState(false);
+    const [isAssistantOpen, setIsAssistantOpen] = useState(false);
     const { unreadCount } = useNotifications();
+    
+    useKeyboardShortcut('k', () => {
+        if (isAuthenticated) setIsAssistantOpen(true);
+    }, { ctrl: true, preventDefault: true });
     const [_, setTick] = useState(0);
 
     useEffect(() => {
@@ -198,7 +205,29 @@ const Navbar = () => {
                                 </div>
                             )}
                             {isAuthenticated && (
-                                <div className="relative mr-2">
+                                <div className="flex items-center gap-1 md:gap-3 mr-2">
+                                    {/* AI Assistant CMD+K Trigger */}
+                                    <button
+                                        onClick={() => setIsAssistantOpen(true)}
+                                        className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800/50 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700/50 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
+                                    >
+                                        <Sparkles className="w-4 h-4 text-brand-500" />
+                                        <span className="text-xs font-medium mr-1">Ask AI</span>
+                                        <kbd className="hidden lg:inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded text-slate-500 dark:text-slate-400">
+                                            <span className="text-[11px]">⌘</span>K
+                                        </kbd>
+                                    </button>
+
+                                    {/* Mobile AI Trigger */}
+                                    <button
+                                        onClick={() => setIsAssistantOpen(true)}
+                                        className="md:hidden relative p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-850/50 text-slate-500 hover:text-brand-500 transition-colors"
+                                        aria-label="AI Assistant"
+                                    >
+                                        <Sparkles className="w-5 h-5 text-brand-500" />
+                                    </button>
+
+                                    <div className="relative">
                                     <button
                                         onClick={() => {
                                             setShowNotificationCenter(!showNotificationCenter);
@@ -219,6 +248,7 @@ const Navbar = () => {
                                         isOpen={showNotificationCenter}
                                         onClose={() => setShowNotificationCenter(false)}
                                     />
+                                    </div>
                                 </div>
                             )}
                             {isAuthenticated ? (
@@ -275,9 +305,11 @@ const Navbar = () => {
                                     )}
                                 </div>
                             ) : (
-                                <Link to="/login" className="text-white bg-brand-600 hover:bg-brand-700 font-medium px-5 py-2.5 rounded-xl flex items-center gap-2 shadow-md shadow-brand-500/20 hover:shadow-lg hover:-translate-y-0.5 transition-all btn-interactive">
-                                    Sign In
-                                </Link>
+                                <div className="flex items-center gap-2 lg:gap-4">
+                                    <Link to="/login" className="text-white bg-brand-600 hover:bg-brand-700 font-medium px-5 py-2.5 rounded-xl flex items-center gap-2 shadow-md shadow-brand-500/20 hover:shadow-lg hover:-translate-y-0.5 transition-all btn-interactive">
+                                        Sign In
+                                    </Link>
+                                </div>
                             )}
                         </div>
                     </div>
@@ -399,6 +431,12 @@ const Navbar = () => {
                     </div>
                 </div>
             )}
+
+            {/* AI Assistant Modal */}
+            <AssistantModal 
+                isOpen={isAssistantOpen} 
+                onClose={() => setIsAssistantOpen(false)} 
+            />
         </nav>
     );
 };

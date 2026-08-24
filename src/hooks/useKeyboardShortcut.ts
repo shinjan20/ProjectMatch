@@ -6,6 +6,8 @@ interface ShortcutOptions {
     preventDefault?: boolean;
     stopPropagation?: boolean;
     enabled?: boolean;
+    ctrl?: boolean;
+    meta?: boolean;
 }
 
 export function useKeyboardShortcut(
@@ -13,16 +15,18 @@ export function useKeyboardShortcut(
     callback: KeyHandler,
     options: ShortcutOptions = {}
 ) {
-    const { preventDefault = false, stopPropagation = false, enabled = true } = options;
+    const { preventDefault = false, stopPropagation = false, enabled = true, ctrl = false } = options;
 
     const handleKeyDown = useCallback(
         (event: KeyboardEvent) => {
             if (!enabled) return;
 
-            // Handle modifier keys if specified in the key string like 'Cmd+K' or 'Ctrl+K'
-            // For now, handling simple exact match keys
-            if (event.key === key) {
-                // Don't trigger if the user is typing in an input or textarea
+            const keyMatch = event.key.toLowerCase() === key.toLowerCase();
+            const ctrlMatch = ctrl ? (event.ctrlKey || event.metaKey) : true;
+            
+            if (keyMatch && ctrlMatch) {
+                // Don't trigger if the user is typing in an input or textarea unless ctrl/meta is pressed
+
                 const target = event.target as HTMLElement;
                 if (
                     target.tagName === 'INPUT' ||
