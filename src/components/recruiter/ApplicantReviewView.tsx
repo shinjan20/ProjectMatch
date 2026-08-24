@@ -13,7 +13,10 @@ interface ApplicantReviewViewProps {
 
 const ApplicantReviewView = ({ candidate, onClose, onAccept, onDecline, isArchived: _isArchived = false, onRevert: _onRevert, onUpdateStage }: ApplicantReviewViewProps) => {
     return (
-        <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-lg mt-4 animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-y-0 right-0 z-[100] w-full md:w-[600px] lg:w-[700px] bg-slate-50 dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl animate-in slide-in-from-right duration-300 flex flex-col h-full">
+            {/* Backdrop overlay (optional if handled by parent, but good for isolated closing) */}
+            <div className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm -z-10" onClick={onClose} />
+            
             {/* Header */}
             <div className="px-6 py-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800">
                 <div className="flex items-center gap-3">
@@ -29,10 +32,10 @@ const ApplicantReviewView = ({ candidate, onClose, onAccept, onDecline, isArchiv
             </div>
 
             {/* Content Area */}
-            <div className="p-6">
-                <div className="flex flex-col md:flex-row gap-6">
+            <div className="flex-1 overflow-y-auto p-6">
+                <div className="flex flex-col gap-8">
                     {/* Candidate Details */}
-                    <div className="w-full md:w-1/3">
+                    <div className="w-full">
                         <div className="flex flex-col items-center text-center">
                             {candidate.photoUrl ? (
                                 <img
@@ -89,7 +92,7 @@ const ApplicantReviewView = ({ candidate, onClose, onAccept, onDecline, isArchiv
                     </div>
 
                     {/* Application Info / Cover Letter */}
-                    <div className="w-full md:w-2/3 md:pl-6 md:border-l md:border-slate-200 md:dark:border-slate-800 flex flex-col justify-between">
+                    <div className="w-full border-t border-slate-200 dark:border-slate-800 pt-8 flex flex-col justify-between">
                         <div>
                             <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-3">Cover Letter</h4>
                             <div className="prose-reading bg-white dark:bg-slate-800/80 p-5 rounded-xl border border-slate-200 dark:border-slate-700/80 max-w-none shadow-sm whitespace-pre-line mb-6 text-slate-700 dark:text-slate-300">

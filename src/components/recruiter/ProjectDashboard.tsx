@@ -363,60 +363,7 @@ const ProjectDashboard = ({ isOpen, onClose, project, onArchive, onAcceptCandida
 
                 {/* Scrollable Content Area */}
                 <div className="px-8 py-6 flex-1 overflow-y-auto bg-slate-50/50 dark:bg-[#0a0f1d]/50">
-                    {reviewingCandidate ? (
-                        <div className="animate-in slide-in-from-right-8 duration-300">
-                            <button
-                                onClick={() => setReviewingCandidate(null)}
-                                className="mb-4 text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white flex items-center gap-1 transition-colors"
-                            >
-                                ← Back to list
-                            </button>
-                            <ApplicantReviewView
-                                candidate={reviewingCandidate}
-                                onClose={() => setReviewingCandidate(null)}
-                                onAccept={(id) => {
-                                    if (onAcceptCandidate) onAcceptCandidate(project.id, id);
-                                    setReviewingCandidate(null);
-                                }}
-                                onDecline={(id) => {
-                                    if (onDeclineCandidate) onDeclineCandidate(project.id, id);
-                                    setReviewingCandidate(null);
-                                }}
-                                isArchived={activeTab === 'archived'}
-                                onRevert={(id) => {
-                                    if (onRevertCandidate) onRevertCandidate(project.id, id);
-                                    setReviewingCandidate(null);
-                                }}
-                                onUpdateStage={(id, stage) => {
-                                    if (onUpdateCandidateStage) onUpdateCandidateStage(project.id, id, stage);
-                                    setReviewingCandidate(null);
-                                }}
-                            />
-                        </div>
-                    ) : reviewingWorkingCandidate ? (
-                        <div className="animate-in slide-in-from-right-8 duration-300">
-                            <button
-                                onClick={() => setReviewingWorkingCandidate(null)}
-                                className="mb-4 text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white flex items-center gap-1 transition-colors"
-                            >
-                                ← Back to Currently Working
-                            </button>
-                            <WorkingCandidateView
-                                candidate={reviewingWorkingCandidate}
-                                onClose={() => setReviewingWorkingCandidate(null)}
-                                onMessage={(id) => {
-                                    if (onMessageWorkingCandidate) onMessageWorkingCandidate(project.id, id);
-                                }}
-                                onSendLetter={(id, type, content) => {
-                                    if (onSendLetter) onSendLetter(project.id, id, type, content);
-                                }}
-                                onCompleteProject={(id) => {
-                                    if (onCompleteProject) onCompleteProject(project.id, id);
-                                }}
-                            />
-                        </div>
-                    ) : (
-                        <div className="animate-in fade-in duration-300 h-full">
+                    <div className="animate-in fade-in duration-300 h-full">
                             {activeTab === 'details' && (
                                 <div className="space-y-8">
                                     {/* Key Info Grid */}
@@ -491,9 +438,61 @@ const ProjectDashboard = ({ isOpen, onClose, project, onArchive, onAcceptCandida
                                 renderCandidateList(project.archivedCandidates, "No archived candidates.")
                             )}
                         </div>
-                    )}
                 </div>
             </div>
+
+
+            {/* Slide-over Review Views */}
+            {reviewingCandidate && (
+                <ApplicantReviewView
+                    candidate={reviewingCandidate}
+                    onClose={() => setReviewingCandidate(null)}
+                    onAccept={(id) => {
+                        if (onAcceptCandidate) onAcceptCandidate(project.id, id);
+                        setReviewingCandidate(null);
+                    }}
+                    onDecline={(id) => {
+                        if (onDeclineCandidate) onDeclineCandidate(project.id, id);
+                        setReviewingCandidate(null);
+                    }}
+                    isArchived={activeTab === 'archived'}
+                    onRevert={(id) => {
+                        if (onRevertCandidate) onRevertCandidate(project.id, id);
+                        setReviewingCandidate(null);
+                    }}
+                    onUpdateStage={(id, stage) => {
+                        if (onUpdateCandidateStage) onUpdateCandidateStage(project.id, id, stage);
+                        setReviewingCandidate(null);
+                    }}
+                />
+            )}
+
+            {reviewingWorkingCandidate && (
+                <div className="fixed inset-y-0 right-0 z-[100] w-full md:w-[600px] lg:w-[700px] bg-slate-50 dark:bg-slate-900 shadow-2xl animate-in slide-in-from-right duration-300 h-full">
+                    <div className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm -z-10" onClick={() => setReviewingWorkingCandidate(null)} />
+                    <div className="h-full overflow-y-auto p-6">
+                        <button
+                            onClick={() => setReviewingWorkingCandidate(null)}
+                            className="mb-4 text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white flex items-center gap-1 transition-colors"
+                        >
+                            ← Back to list
+                        </button>
+                        <WorkingCandidateView
+                            candidate={reviewingWorkingCandidate}
+                            onClose={() => setReviewingWorkingCandidate(null)}
+                            onMessage={(id) => {
+                                if (onMessageWorkingCandidate) onMessageWorkingCandidate(project.id, id);
+                            }}
+                            onSendLetter={(id, type, content) => {
+                                if (onSendLetter) onSendLetter(project.id, id, type, content);
+                            }}
+                            onCompleteProject={(id) => {
+                                if (onCompleteProject) onCompleteProject(project.id, id);
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
 
             {/* Floating Comparison Tray — appears when 2+ candidates are selected */}
             {compareIds.length >= 2 && !showCompareModal && (

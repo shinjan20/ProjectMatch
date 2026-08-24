@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Send, Link as LinkIcon, AlertCircle, Sparkles } from 'lucide-react';
 import { MOCK_PROJECTS } from '../../constants';
 import { checkFormForProfanityAsync } from '../../utils/profanityFilter';
@@ -34,16 +34,28 @@ export default function ApplicationModal({ isOpen, onClose, projectId, project: 
     // So this is partially mocked until Projects.tsx is connected to Supabase full.
     const project = passedProject || MOCK_PROJECTS.find(p => p.id === projectId);
 
-    const [coverLetter, setCoverLetter] = useState('');
+    const draftKey = `draft_cover_letter_${projectId}`;
+    const [coverLetter, setCoverLetter] = useState(() => localStorage.getItem(draftKey) || '');
     const [portfolioUrl, setPortfolioUrl] = useState(localStorage.getItem('studentResumeUrl') || '');
     const [availability, setAvailability] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
     
+    // Auto-save cover letter
+    useEffect(() => {
+        if (coverLetter) {
+            localStorage.setItem(draftKey, coverLetter);
+        } else {
+            localStorage.removeItem(draftKey);
+        }
+    }, [coverLetter, draftKey]);
+
     // Add escape to close shortcut
     useKeyboardShortcut('Escape', onClose, { enabled: isOpen });
     const [matchScore, setMatchScore] = useState<number | null>(null);
     const [matchFeedback, setMatchFeedback] = useState<string>('');
+    const [matchedSkills, setMatchedSkills] = useState<string[]>([]);
+    const [missingSkills, setMissingSkills] = useState<string[]>([]);
     const [isCalculatingScore, setIsCalculatingScore] = useState(false);
 
     if (!project) return null;
@@ -98,9 +110,11 @@ export default function ApplicationModal({ isOpen, onClose, projectId, project: 
                 }]);
 
             if (insertError) throw insertError;
-
+            
+            localStorage.removeItem(draftKey);
             toast.success('Application submitted successfully!');
             onSubmitSuccess();
+            onClose();
         } catch (err: unknown) {
             console.error('Application error:', err);
             const errorMessage = err instanceof Error ? err.message : 'Failed to submit application.';
@@ -122,6 +136,8 @@ export default function ApplicationModal({ isOpen, onClose, projectId, project: 
         setIsCalculatingScore(true);
         setMatchScore(null);
         setMatchFeedback('');
+        setMatchedSkills([]);
+        setMissingSkills([]);
         
         try {
             // We need a brief representation of the user. Ideally from a DB, but we will mock briefly if not available.
@@ -138,6 +154,8 @@ export default function ApplicationModal({ isOpen, onClose, projectId, project: 
             
             setMatchScore(result.score);
             setMatchFeedback(result.feedback);
+            setMatchedSkills(result.matchedSkills || []);
+            setMissingSkills(result.missingSkills || []);
         } catch (err: any) {
             toast.error('Could not calculate AI Match Score at this time.');
         } finally {
@@ -244,9 +262,33 @@ export default function ApplicationModal({ isOpen, onClose, projectId, project: 
                                                     </span>
                                                     <span className="text-xs text-slate-500 font-medium">AI Feedback Helper</span>
                                                 </div>
-                                                <p className="text-xs text-slate-600 dark:text-slate-350 leading-relaxed">
+                                                <p className="text-xs text-slate-600 dark:text-slate-350 leading-relaxed mb-3">
                                                     {matchFeedback}
                                                 </p>
+                                                
+                                                {/* Qualitative Breakdown */}
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                                                    <div>
+                                                        <h5 className="text-[10px] font-bold uppercase tracking-wider text-green-600 dark:text-green-400 mb-1.5 flex items-center gap-1">
+                                                            <Sparkles className="w-3 h-3" /> Matching Strengths
+                                                        </h5>
+                                                        <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-1">
+                                                            {matchedSkills.length > 0 
+                                                                ? matchedSkills.map((skill, i) => <li key={i} className="flex items-start gap-1"><span className="text-green-500">•</span> {skill}</li>)
+                                                                : <li className="italic opacity-60">No direct skill matches identified.</li>}
+                                                        </ul>
+                                                    </div>
+                                                    <div>
+                                                        <h5 className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-1.5 flex items-center gap-1">
+                                                            <AlertCircle className="w-3 h-3" /> Missing/Gap Areas
+                                                        </h5>
+                                                        <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-1">
+                                                            {missingSkills.length > 0 
+                                                                ? missingSkills.map((skill, i) => <li key={i} className="flex items-start gap-1"><span className="text-amber-500">•</span> {skill}</li>)
+                                                                : <li className="italic opacity-60">No major gaps identified!</li>}
+                                                        </ul>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <button
                                                 type="button"
