@@ -6,6 +6,7 @@ import { IntentSchema } from "./zodSchemas.ts";
 
 const genAI = new GoogleGenerativeAI(Deno.env.get("GEMINI_API_KEY") || "");
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+const embeddingModel = genAI.getGenerativeModel({ model: "text-embedding-004" });
 
 Deno.serve(async (req: Request) => {
   // Handle CORS preflight requests
@@ -130,13 +131,28 @@ Deno.serve(async (req: Request) => {
 // --- Handlers ---
 
 async function handleProjectSearch(supabase: any, originalQuery: string, intentData: any, role: string) {
-  // Mock Retrieval: In a real app, use pgvector or SQL based on `intentData.semantic_query`
-  // For MVP, we will fetch recent projects using standard SQL
-  
-  const { data: projects, error } = await supabase
-    .from('projects')
-    .select('id, role, domain, tenure, remuneration')
-    .limit(5);
+  let projects;
+  let error;
+
+  if (intentData.semantic_query) {
+    const embedResult = await embeddingModel.embedContent(intentData.semantic_query);
+    const embedding = embedResult.embedding.values;
+
+    const { data, error: rpcError } = await supabase.rpc('match_projects', {
+      query_embedding: `[${embedding.join(',')}]`,
+      match_threshold: 0.3,
+      match_count: 5
+    });
+    projects = data;
+    error = rpcError;
+  } else {
+    const { data, error: fetchError } = await supabase
+      .from('projects')
+      .select('id, role, domain, tenure, remuneration')
+      .limit(5);
+    projects = data;
+    error = fetchError;
+  }
 
   if (error || !projects || projects.length === 0) {
      return {
@@ -196,12 +212,29 @@ async function handleCandidateSearch(supabase: any, originalQuery: string, inten
      };
   }
 
-  // MVP: Fetch top students
-  const { data: candidates, error } = await supabase
-    .from('profiles')
-    .select('id, full_name, role, avatar_url')
-    .eq('role', 'student')
-    .limit(5);
+  let candidates;
+  let error;
+
+  if (intentData.semantic_query) {
+    const embedResult = await embeddingModel.embedContent(intentData.semantic_query);
+    const embedding = embedResult.embedding.values;
+
+    const { data, error: rpcError } = await supabase.rpc('match_candidates', {
+      query_embedding: `[${embedding.join(',')}]`,
+      match_threshold: 0.3,
+      match_count: 5
+    });
+    candidates = data;
+    error = rpcError;
+  } else {
+    const { data, error: fetchError } = await supabase
+      .from('profiles')
+      .select('id, full_name, role, avatar_url')
+      .eq('role', 'student')
+      .limit(5);
+    candidates = data;
+    error = fetchError;
+  }
 
   if (error || !candidates || candidates.length === 0) {
      return {
