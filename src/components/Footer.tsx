@@ -1,4 +1,4 @@
-import { Briefcase, Github, Linkedin, Twitter } from 'lucide-react';
+import { Github, Linkedin, Twitter } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
@@ -9,11 +9,16 @@ const Footer = () => {
                     {/* Brand */}
                     <div className="md:col-span-1 text-center md:text-left flex flex-col items-center md:items-start">
                         <div className="flex items-center gap-2 mb-4">
-                            <div className="bg-brand-600 p-2 rounded-xl">
-                                <Briefcase className="w-5 h-5 text-white" />
+                            <div className="w-8 h-8 flex items-center justify-center">
+                                <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+                                    {/* Left Chevron */}
+                                    <path d="M12 16 L4 8 H12 L20 16 L12 24 H4 L12 16 Z" fill="currentColor" className="text-slate-900 dark:text-white" />
+                                    {/* Right Chevron */}
+                                    <path d="M22 16 L14 8 H22 L30 16 L22 24 H14 L22 16 Z" fill="#4F46E5" />
+                                </svg>
                             </div>
-                            <span className="font-heading font-bold text-xl tracking-tight text-slate-900 dark:text-white">
-                                ProjectMatch
+                            <span className="font-heading tracking-tight text-slate-900 dark:text-white text-xl">
+                                <span className="font-medium">Project</span><span className="font-bold">Match</span>
                             </span>
                         </div>
                         <p className="text-slate-500 dark:text-slate-400 mb-6 max-w-sm mx-auto md:mx-0">

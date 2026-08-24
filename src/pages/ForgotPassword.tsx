@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Briefcase, Mail, AlertCircle, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { Mail, AlertCircle, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 const ForgotPassword = () => {
@@ -50,8 +50,11 @@ const ForgotPassword = () => {
             <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <div className="flex justify-center mb-6">
                     <Link to="/" className="flex items-center gap-2 group">
-                        <div className="bg-gradient-to-br from-brand-500 to-purple-600 p-3 rounded-2xl shadow-xl shadow-brand-500/20 group-hover:shadow-brand-500/40 group-hover:scale-105 transition-all duration-300">
-                            <Briefcase className="w-8 h-8 text-white" />
+                        <div className="w-12 h-12 flex items-center justify-center transition-all duration-300 group-hover:scale-105">
+                            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+                                <path d="M12 16 L4 8 H12 L20 16 L12 24 H4 L12 16 Z" fill="currentColor" className="text-slate-900 dark:text-white" />
+                                <path d="M22 16 L14 8 H22 L30 16 L22 24 H14 L22 16 Z" fill="#4F46E5" />
+                            </svg>
                         </div>
                     </Link>
                 </div>
