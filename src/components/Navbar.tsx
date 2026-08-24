@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, LogOut, User as UserIcon, Settings as SettingsIcon, MoreHorizontal, Check, XCircle, CheckCircle2, Bell, Sparkles } from 'lucide-react';
+import { Menu, X, LogOut, User as UserIcon, Settings as SettingsIcon, MoreHorizontal, Check, XCircle, CheckCircle2, Bell, TerminalSquare } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useInterviewStatus } from '../hooks/useInterviewStatus';
@@ -209,10 +209,10 @@ const Navbar = () => {
                                     {/* AI Assistant CMD+K Trigger */}
                                     <button
                                         onClick={() => setIsAssistantOpen(true)}
-                                        className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800/50 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700/50 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
+                                        className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700/80 rounded-xl border border-slate-200 dark:border-slate-700/80 text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors shadow-sm"
                                     >
-                                        <Sparkles className="w-4 h-4 text-brand-500" />
-                                        <span className="text-xs font-medium mr-1">Ask AI</span>
+                                        <TerminalSquare className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                                        <span className="text-xs font-bold mr-1">Ask ProjectMatch</span>
                                         <kbd className="hidden lg:inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded text-slate-500 dark:text-slate-400">
                                             <span className="text-[11px]">⌘</span>K
                                         </kbd>
@@ -221,10 +221,10 @@ const Navbar = () => {
                                     {/* Mobile AI Trigger */}
                                     <button
                                         onClick={() => setIsAssistantOpen(true)}
-                                        className="md:hidden relative p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-850/50 text-slate-500 hover:text-brand-500 transition-colors"
-                                        aria-label="AI Assistant"
+                                        className="md:hidden relative p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/80 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
+                                        aria-label="Ask ProjectMatch"
                                     >
-                                        <Sparkles className="w-5 h-5 text-brand-500" />
+                                        <TerminalSquare className="w-5 h-5" />
                                     </button>
 
                                     <div className="relative">

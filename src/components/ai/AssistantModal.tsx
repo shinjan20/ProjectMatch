@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Send, Sparkles } from 'lucide-react';
+import { X, CornerDownLeft, TerminalSquare, Search, FileText } from 'lucide-react';
 import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 import { askProjectMatch } from '../../services/ai';
 import type { AIResponse } from '../../services/ai';
@@ -23,11 +23,12 @@ export default function AssistantModal({ isOpen, onClose }: AssistantModalProps)
         {
             id: '1',
             role: 'assistant',
-            content: "Hi! I'm your ProjectMatch Assistant. I can help you find candidates, search for projects, or analyze profiles. What are you looking for?"
+            content: "Welcome to the ProjectMatch Command Workspace. You can search projects, find candidates, or ask about specific profiles."
         }
     ]);
     const [input, setInput] = useState('');
     const [isThinking, setIsThinking] = useState(false);
+    const [loadingStage, setLoadingStage] = useState('');
     
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -63,6 +64,15 @@ export default function AssistantModal({ isOpen, onClose }: AssistantModalProps)
         const loadingId = (Date.now() + 1).toString();
         setMessages(prev => [...prev, { id: loadingId, role: 'assistant', loading: true }]);
         setIsThinking(true);
+        setLoadingStage('Classifying intent...');
+        
+        const stageInterval = setInterval(() => {
+            setLoadingStage(prev => {
+                if (prev === 'Classifying intent...') return 'Searching database...';
+                if (prev === 'Searching database...') return 'Synthesizing results...';
+                return prev;
+            });
+        }, 800);
 
         try {
             // Get page context (mocked for now, normally derived from location or selected items)
@@ -85,101 +95,120 @@ export default function AssistantModal({ isOpen, onClose }: AssistantModalProps)
                 content: "I'm having trouble connecting right now. Please try again later."
             } : m));
         } finally {
+            clearInterval(stageInterval);
             setIsThinking(false);
         }
     };
 
     return (
         <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center sm:p-6 bg-transparent">
-            {/* Backdrop */}
+            {/* Backdrop - Solid, no glassmorphism */}
             <div
-                className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity animate-in fade-in duration-300"
+                className="absolute inset-0 bg-slate-900/40 transition-opacity animate-in fade-in duration-300"
                 onClick={onClose}
             />
 
-            {/* Modal Box */}
-            <div className="relative w-full sm:max-w-2xl h-[95dvh] sm:h-[80vh] bg-slate-50 dark:bg-[#0a0f1c] sm:rounded-[2rem] rounded-t-3xl shadow-2xl shadow-brand-500/10 border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300 flex flex-col">
+            {/* Modal Box - Solid surfaces, crisp borders */}
+            <div className="relative w-full sm:max-w-3xl h-[95dvh] sm:h-[85vh] bg-white dark:bg-[#0a0f1c] sm:rounded-xl rounded-t-2xl shadow-2xl shadow-slate-900/20 border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 flex flex-col font-sans">
                 
-                {/* Mobile Drag Handle */}
-                <div className="w-full flex justify-center pt-3 pb-1 sm:hidden" onClick={onClose}>
-                    <div className="w-12 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700" />
-                </div>
-
                 {/* Header */}
-                <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900 shrink-0">
-                    <div className="flex items-center gap-3">
-                        <div className="bg-gradient-to-tr from-brand-500 to-purple-500 p-2 rounded-xl text-white shadow-md shadow-brand-500/20">
-                            <Sparkles className="w-5 h-5" />
-                        </div>
-                        <div>
-                            <h2 className="text-lg font-bold font-heading text-slate-900 dark:text-white leading-tight">
-                                AI Assistant
-                            </h2>
-                            <p className="text-xs text-brand-600 dark:text-brand-400 font-medium">Powered by Gemini</p>
-                        </div>
+                <div className="px-5 py-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900 shrink-0">
+                    <div className="flex items-center gap-2 text-slate-800 dark:text-slate-200">
+                        <TerminalSquare className="w-5 h-5" />
+                        <h2 className="text-sm font-bold tracking-wide">
+                            Ask ProjectMatch
+                        </h2>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-colors"
+                        className="text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 flex items-center gap-1 transition-colors"
                     >
-                        <X className="w-5 h-5" />
+                        Esc <X className="w-4 h-4" />
                     </button>
                 </div>
 
-                {/* Chat Area */}
-                <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-                    {messages.map((msg) => (
-                        <div key={msg.id} className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                            {msg.role === 'user' ? (
-                                <div className="max-w-[85%] bg-brand-600 text-white rounded-2xl rounded-tr-sm px-5 py-3 shadow-sm">
-                                    <p className="text-sm">{msg.content}</p>
+                {/* Persistent Context Bar */}
+                <div className="px-5 py-3 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0a0f1c] shrink-0">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Context</p>
+                    <div className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/50 w-fit px-3 py-1.5 rounded-md border border-slate-200 dark:border-slate-700">
+                        <Search className="w-3.5 h-3.5 text-slate-500" />
+                        <span>Global Search</span>
+                    </div>
+                </div>
+
+                {/* Workspace Area */}
+                <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-8 bg-white dark:bg-[#0a0f1c]">
+                    {messages.map((msg, index) => {
+                        // Group user and assistant messages for a cleaner workspace flow
+                        if (msg.role === 'user') {
+                            return (
+                                <div key={msg.id} className="w-full">
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">You Asked</p>
+                                    <p className="text-base font-medium text-slate-900 dark:text-white border-l-2 border-slate-300 dark:border-slate-700 pl-4 py-1">
+                                        {msg.content}
+                                    </p>
                                 </div>
-                            ) : (
-                                <div className="max-w-[95%] sm:max-w-[85%]">
+                            );
+                        } else {
+                            // Assistant message
+                            const isFirstMessage = index === 0;
+                            return (
+                                <div key={msg.id} className="w-full">
+                                    {!isFirstMessage && (
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3">Results</p>
+                                    )}
                                     {msg.loading ? (
-                                        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl rounded-tl-sm px-5 py-4 shadow-sm flex items-center gap-3 text-slate-500">
+                                        <div className="flex items-center gap-3 text-brand-600 dark:text-brand-400 py-2">
                                             <div className="w-4 h-4 border-2 border-brand-500/30 border-t-brand-500 rounded-full animate-spin"></div>
-                                            <span className="text-sm font-medium animate-pulse">Thinking...</span>
+                                            <span className="text-sm font-medium">{loadingStage}</span>
                                         </div>
                                     ) : msg.structuredData ? (
                                         <StructuredResponses response={msg.structuredData} />
                                     ) : (
-                                        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-2xl rounded-tl-sm px-5 py-3 shadow-sm">
-                                            <p className="text-sm">{msg.content}</p>
+                                        <div className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                                            <p>{msg.content}</p>
                                         </div>
                                     )}
                                 </div>
-                            )}
-                        </div>
-                    ))}
+                            );
+                        }
+                    })}
                     <div ref={messagesEndRef} />
                 </div>
 
                 {/* Input Area */}
-                <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 pb-safe-bottom shrink-0">
-                    <form onSubmit={handleSubmit} className="relative flex items-end gap-2 max-w-4xl mx-auto">
-                        <div className="relative flex-1">
+                <div className="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shrink-0">
+                    <form onSubmit={handleSubmit} className="relative flex flex-col gap-2 max-w-4xl mx-auto">
+                        <div className="relative flex-1 bg-white dark:bg-[#0a0f1c] border border-slate-300 dark:border-slate-700 focus-within:border-brand-500 focus-within:ring-1 focus-within:ring-brand-500 rounded-lg overflow-hidden transition-all shadow-sm">
                             <input
                                 ref={inputRef}
                                 type="text"
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
-                                placeholder="Ask me anything..."
-                                className="w-full bg-slate-100 dark:bg-slate-800 border-transparent focus:bg-white dark:focus:bg-[#030712] focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 text-slate-900 dark:text-white rounded-2xl pl-5 pr-12 py-3.5 sm:py-4 outline-none transition-all"
+                                placeholder="Search projects, compare candidates, or ask about your work..."
+                                className="w-full bg-transparent text-slate-900 dark:text-white pl-4 pr-12 py-3.5 outline-none text-sm font-medium"
                                 disabled={isThinking}
                             />
+                            <button
+                                type="submit"
+                                disabled={!input.trim() || isThinking}
+                                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 disabled:opacity-50 text-slate-600 dark:text-slate-300 rounded-md transition-colors"
+                                title="Send"
+                            >
+                                <CornerDownLeft className="w-4 h-4" />
+                            </button>
                         </div>
-                        <button
-                            type="submit"
-                            disabled={!input.trim() || isThinking}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-brand-600 hover:bg-brand-700 disabled:bg-slate-300 disabled:dark:bg-slate-700 text-white rounded-xl transition-colors shrink-0"
-                        >
-                            <Send className="w-4 h-4 sm:w-5 sm:h-5" />
-                        </button>
+                        <div className="flex items-center justify-between px-1">
+                            <div className="flex gap-4">
+                                <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                                    <Search className="w-3 h-3" /> Search projects
+                                </span>
+                                <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                                    <FileText className="w-3 h-3" /> Compare candidates
+                                </span>
+                            </div>
+                        </div>
                     </form>
-                    <div className="text-center mt-3 hidden sm:block">
-                        <p className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">ProjectMatch AI • Verify important info</p>
-                    </div>
                 </div>
             </div>
         </div>
