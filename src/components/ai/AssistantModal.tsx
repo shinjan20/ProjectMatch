@@ -100,8 +100,10 @@ export default function AssistantModal({ isOpen, onClose }: AssistantModalProps)
         }
     };
 
+    const isWorkspaceActive = messages.length > 1;
+
     return (
-        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center sm:p-6 bg-transparent">
+        <div className={`fixed inset-0 z-[100] flex sm:flex-col items-center justify-end sm:justify-start sm:p-6 bg-transparent transition-all duration-300 ease-out ${isWorkspaceActive ? 'sm:pt-[10vh]' : 'sm:pt-[38vh]'}`}>
             {/* Backdrop - Solid, no glassmorphism */}
             <div
                 className="absolute inset-0 bg-slate-900/40 transition-opacity animate-in fade-in duration-300"
@@ -109,7 +111,7 @@ export default function AssistantModal({ isOpen, onClose }: AssistantModalProps)
             />
 
             {/* Modal Box - Solid surfaces, crisp borders */}
-            <div className="relative w-full sm:max-w-3xl max-h-[95dvh] sm:max-h-[85vh] h-auto bg-white dark:bg-[#0a0f1c] sm:rounded-xl rounded-t-2xl shadow-2xl shadow-slate-900/20 border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 flex flex-col font-sans">
+            <div className={`relative w-full sm:max-w-3xl bg-white dark:bg-[#0a0f1c] sm:rounded-xl rounded-t-2xl shadow-2xl shadow-slate-900/20 border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all duration-300 ease-out flex flex-col font-sans animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-0 sm:zoom-in-95 ${isWorkspaceActive ? 'h-auto max-h-[95dvh] sm:max-h-[80vh]' : 'h-auto'}`}>
                 
                 {/* Header */}
                 <div className="px-5 py-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900 shrink-0">
@@ -154,7 +156,10 @@ export default function AssistantModal({ isOpen, onClose }: AssistantModalProps)
                             return (
                                 <div key={msg.id} className="w-full">
                                     {!isFirstMessage && (
-                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3">PROJECTMATCH FOUND</p>
+                                        <div className="flex items-center gap-2 mb-3 mt-4">
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">PROJECTMATCH FOUND</p>
+                                            <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800/50"></div>
+                                        </div>
                                     )}
                                     {msg.loading ? (
                                         <div className="flex items-center gap-3 text-brand-600 dark:text-brand-400 py-2">
