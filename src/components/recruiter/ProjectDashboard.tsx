@@ -47,13 +47,13 @@ const ProjectDashboard = ({ isOpen, onClose, project, onArchive, onAcceptCandida
         setCompareIds([]);
         setShowCompareModal(false);
     };
-
     // Determine current list based on activeTab
+    // Safe access using optional chaining for when project is null
     const currentCandidates = activeTab === 'applicants' 
-        ? (project.appliedCandidates || []) 
+        ? (project?.appliedCandidates || []) 
         : activeTab === 'working' 
-            ? (project.workingCandidates || []) 
-            : (project.archivedCandidates || []);
+            ? (project?.workingCandidates || []) 
+            : (project?.archivedCandidates || []);
 
     const navigateCandidate = (direction: 'next' | 'prev') => {
         if (!reviewingCandidate) return;
