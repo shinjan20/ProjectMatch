@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, CornerDownLeft, TerminalSquare, Search, FileText } from 'lucide-react';
+import { X, CornerDownLeft, Search } from 'lucide-react';
 import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 import { askProjectMatch } from '../../services/ai';
 import type { AIResponse } from '../../services/ai';
@@ -92,7 +92,7 @@ export default function AssistantModal({ isOpen, onClose }: AssistantModalProps)
             setMessages(prev => prev.map(m => m.id === loadingId ? {
                 id: loadingId,
                 role: 'assistant',
-                content: "I'm having trouble connecting right now. Please try again later."
+                content: "We couldn't complete that search. Try again in a moment."
             } : m));
         } finally {
             clearInterval(stageInterval);
@@ -109,14 +109,13 @@ export default function AssistantModal({ isOpen, onClose }: AssistantModalProps)
             />
 
             {/* Modal Box - Solid surfaces, crisp borders */}
-            <div className="relative w-full sm:max-w-3xl h-[95dvh] sm:h-[85vh] bg-white dark:bg-[#0a0f1c] sm:rounded-xl rounded-t-2xl shadow-2xl shadow-slate-900/20 border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 flex flex-col font-sans">
+            <div className="relative w-full sm:max-w-3xl max-h-[95dvh] sm:max-h-[85vh] h-auto bg-white dark:bg-[#0a0f1c] sm:rounded-xl rounded-t-2xl shadow-2xl shadow-slate-900/20 border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 flex flex-col font-sans">
                 
                 {/* Header */}
                 <div className="px-5 py-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900 shrink-0">
-                    <div className="flex items-center gap-2 text-slate-800 dark:text-slate-200">
-                        <TerminalSquare className="w-5 h-5" />
-                        <h2 className="text-sm font-bold tracking-wide">
-                            Ask ProjectMatch
+                    <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+                        <h2 className="text-sm font-semibold tracking-wide">
+                            <span className="text-brand-600 dark:text-brand-500 mr-2">→</span>Ask ProjectMatch
                         </h2>
                     </div>
                     <button
@@ -143,7 +142,7 @@ export default function AssistantModal({ isOpen, onClose }: AssistantModalProps)
                         if (msg.role === 'user') {
                             return (
                                 <div key={msg.id} className="w-full">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">You Asked</p>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">YOU ASKED</p>
                                     <p className="text-base font-medium text-slate-900 dark:text-white border-l-2 border-slate-300 dark:border-slate-700 pl-4 py-1">
                                         {msg.content}
                                     </p>
@@ -155,7 +154,7 @@ export default function AssistantModal({ isOpen, onClose }: AssistantModalProps)
                             return (
                                 <div key={msg.id} className="w-full">
                                     {!isFirstMessage && (
-                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3">Results</p>
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3">PROJECTMATCH FOUND</p>
                                     )}
                                     {msg.loading ? (
                                         <div className="flex items-center gap-3 text-brand-600 dark:text-brand-400 py-2">
@@ -198,13 +197,13 @@ export default function AssistantModal({ isOpen, onClose }: AssistantModalProps)
                                 <CornerDownLeft className="w-4 h-4" />
                             </button>
                         </div>
-                        <div className="flex items-center justify-between px-1">
-                            <div className="flex gap-4">
-                                <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                                    <Search className="w-3 h-3" /> Search projects
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between px-1 gap-2 sm:gap-0 mt-3">
+                            <div className="flex flex-wrap gap-x-4 gap-y-2">
+                                <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer transition-colors">
+                                    Find product management opportunities
                                 </span>
-                                <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                                    <FileText className="w-3 h-3" /> Compare candidates
+                                <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer transition-colors">
+                                    Compare candidates
                                 </span>
                             </div>
                         </div>
