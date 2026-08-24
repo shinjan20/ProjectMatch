@@ -79,6 +79,11 @@ const RecruiterDashboard = () => {
                     photoUrl: app.profiles?.photo_url || null,
                     college: app.profiles?.college || 'Unknown College',
                     domain: app.profiles?.domain || 'Unknown Domain',
+                    skills: app.profiles?.skills || [],
+                    portfolioUrl: app.portfolio_url || app.profiles?.portfolio_url || null,
+                    githubUrl: app.profiles?.github_url || null,
+                    linkedinUrl: app.profiles?.linkedin_url || null,
+                    completedProjects: 0,
                     applicationStatus: app.status,
                     coverLetter: app.cover_letter,
                     availability: app.availability
@@ -122,17 +127,18 @@ const RecruiterDashboard = () => {
             setArchivedProjects(formattedProjects.filter(p => ['completed', 'archived'].includes(p.status)));
             
             // Sync selected project details if one was open
-            if (selectedProject) {
-                const updatedSelected = formattedProjects.find(p => p.id === selectedProject.id);
-                if (updatedSelected) {
-                    setSelectedProject(updatedSelected);
+            setSelectedProject((prev: any) => {
+                if (prev) {
+                    const updatedSelected = formattedProjects.find(p => p.id === prev.id);
+                    return updatedSelected || prev;
                 }
-            }
+                return prev;
+            });
         } catch (err) {
             console.error("Error fetching dashboard data:", err);
             toast.error("Failed to load your projects.");
         }
-    }, [userId, selectedProject]);
+    }, [userId]);
 
     useEffect(() => {
         fetchRecruiterData();
@@ -936,11 +942,6 @@ const RecruiterDashboard = () => {
             totalHired += p.workingCandidates?.length || 0;
             totalShortlisted += p.appliedCandidates?.filter((c: any) => c.applicationStatus === 'shortlisted').length || 0;
             totalInterviewed += p.appliedCandidates?.filter((c: any) => c.applicationStatus === 'interview').length || 0;
-        });
-
-        archivedProjects.forEach(p => {
-            totalApplicants += (p.appliedCandidates?.length || 0) + (p.workingCandidates?.length || 0) + (p.archivedCandidates?.length || 0);
-            totalHired += p.workingCandidates?.length || 0;
         });
 
         const avgTimeToHire = totalHired > 0 ? "8.2 Days" : "N/A";

@@ -82,6 +82,8 @@ const Register = () => {
             if (step === 1) {
                 if (!name || !email || !companyName || !companyWebsite || !password) {
                     setError('Please fill out all fields including password.');
+                    setIsLoading(false);
+                    return; // FIX #1: was missing — prevented early exit
                 }
                 if (passwordStrength === 'Weak') {
                     setError('Please use a stronger password (must be at least 8 characters).');

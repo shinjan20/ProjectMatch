@@ -57,6 +57,15 @@ export default function StudentDashboard() {
     const [archivedProjects, setArchivedProjects] = useState<any[]>([]);
 
     const [threads, setThreads] = useState<any[]>([]);
+    // FIX #12: fetch skills from Supabase profile, not stale localStorage
+    const [studentProfileSkills, setStudentProfileSkills] = useState<string[]>([]);
+
+    useEffect(() => {
+        if (!userId) return;
+        supabase.from('profiles').select('skills').eq('id', userId).maybeSingle().then(({ data }) => {
+            if (data?.skills) setStudentProfileSkills(data.skills);
+        });
+    }, [userId]);
 
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -279,7 +288,7 @@ export default function StudentDashboard() {
 
         fetchStudentData();
 
-        // Subscribe to application updates for real-time notifications
+        // FIX #14: Subscribe to application updates for real-time notifications
         const appsChannel = supabase.channel('student_applications')
             .on(
                 'postgres_changes',
@@ -519,8 +528,8 @@ export default function StudentDashboard() {
         const responseRate = total > 0 ? Math.round((responded / total) * 100) : 0;
         const shortlistRate = total > 0 ? Math.round((shortlisted / total) * 100) : 0;
         
-        const studentSkillsRaw = localStorage.getItem('studentSkills');
-        const studentSkills = studentSkillsRaw ? JSON.parse(studentSkillsRaw) : [];
+        // FIX #12: use live Supabase skills instead of localStorage
+        const studentSkills = studentProfileSkills;
         const requiredSkills = ['React', 'Node.js', 'TypeScript', 'Figma', 'Python', 'SEO', 'AWS', 'TensorFlow'];
         const missingSkills = requiredSkills.filter(s => !studentSkills.includes(s)).slice(0, 3);
 

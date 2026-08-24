@@ -2,6 +2,14 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 export type UserRole = 'student' | 'recruiter' | null;
 
+// All localStorage keys owned by this app — used for targeted cleanup on logout
+const APP_STORAGE_KEYS = [
+    'userRole', 'userName', 'userEmail', 'userId', 'userPhoto',
+    'hasCompletedProfile', 'pendingAuthRole',
+    'studentSkills', 'studentDomain', 'studentResumeUrl',
+];
+const clearAppStorage = () => APP_STORAGE_KEYS.forEach(k => localStorage.removeItem(k));
+
 interface AuthContextType {
     userRole: UserRole;
     userName: string;
@@ -9,6 +17,7 @@ interface AuthContextType {
     userPhoto: string | null;
     userId: string | null;
     isAuthenticated: boolean;
+    isAuthLoading: boolean;
     hasCompletedProfile: boolean;
     login: (role: UserRole, name?: string, photoUrl?: string) => Promise<void>;
     loginWithGoogle: (role: UserRole) => Promise<void>;
@@ -30,6 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [userPhoto, setUserPhoto] = useState<string | null>(null);
     const [userId, setUserId] = useState<string | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+    const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true); // FIX #17: prevents flash of wrong route
     const [hasCompletedProfile, setHasCompletedProfile] = useState<boolean>(false);
 
     useEffect(() => {
@@ -76,7 +86,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     // Check if profile exists, if not create it
                     const { data: profile } = await supabase
                         .from('profiles')
-                        .select('id, college, domain')
+                        .select('id, college, domain, company_name')
                         .eq('id', user.id)
                         .maybeSingle();
 
@@ -92,10 +102,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                             profileData.company_website = metadata.company_website || null;
                         }
                         await supabase.from('profiles').insert([profileData]);
-                    } else if (profile.college && profile.domain) {
-                        // Profile is fully set up in DB
-                        localStorage.setItem('hasCompletedProfile', 'true');
-                        setHasCompletedProfile(true);
+                    } else {
+                        // FIX #2: Role-aware profile completion check
+                        // Students need college + domain; Recruiters need company_name
+                        const isComplete = finalRole === 'recruiter'
+                            ? !!(profile.company_name)
+                            : !!(profile.college && profile.domain);
+                        if (isComplete) {
+                            localStorage.setItem('hasCompletedProfile', 'true');
+                            setHasCompletedProfile(true);
+                        }
                     }
                 } catch (err) {
                     console.error("Error ensuring profile exists:", err);
@@ -107,9 +123,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setUserPhoto(photo);
                 setUserId(user.id);
                 setIsAuthenticated(true);
+                setIsAuthLoading(false); // auth resolved
             } else if (event === 'SIGNED_OUT') {
-                // Clear local states completely
-                localStorage.clear();
+                // FIX #4: Only clear app-owned keys, not all localStorage
+                clearAppStorage();
                 setUserRole(null);
                 setUserName('');
                 setUserEmail('');
@@ -117,6 +134,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setUserId(null);
                 setIsAuthenticated(false);
                 setHasCompletedProfile(false);
+                setIsAuthLoading(false); // auth resolved
+            } else {
+                // Any other event (TOKEN_REFRESHED, USER_UPDATED, INITIAL_SESSION)
+                setIsAuthLoading(false);
             }
         });
 
@@ -235,18 +256,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } catch (err) {
             console.error('Error signing out:', err);
         } finally {
-            // Forcefully clear any Supabase session keys since the API can sometimes
-            // throw an error on an expired token, leaving the corrupted token stuck.
+            // Remove only Supabase session keys (not all localStorage)
             Object.keys(localStorage).forEach(key => {
                 if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
                     localStorage.removeItem(key);
                 }
             });
 
-            // Supabase onAuthStateChange will handle the rest of the local cleanup, 
-            // but we'll forcefully clear all local storage here for immediate UI update 
-            // to guarantee no mock data or orphaned states remain active.
-            localStorage.clear();
+            // FIX #4: Remove only app-owned keys to avoid data loss
+            clearAppStorage();
             setUserRole(null);
             setUserName('');
             setUserEmail('');
@@ -297,7 +315,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return (
         <AuthContext.Provider value={{
-            userRole, userName, userEmail, userPhoto, userId, isAuthenticated, hasCompletedProfile,
+            userRole, userName, userEmail, userPhoto, userId, isAuthenticated, isAuthLoading, hasCompletedProfile,
             login, loginWithGoogle, loginWithEmail, registerWithEmail, verifyOtp,
             logout, updateUserPhoto, completeProfile, updatePassword
         }}>

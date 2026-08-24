@@ -53,23 +53,37 @@ const ApplicantReviewView = ({ candidate, onClose, onAccept, onDecline, isArchiv
                         </div>
 
                         <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
-                            <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Links & Docs</h4>
+                            <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Links &amp; Docs</h4>
                             <ul className="space-y-3">
-                                <li>
-                                    <a href="#" className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:underline">
-                                        <FileText className="w-4 h-4" /> Resume.pdf
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:underline">
-                                        <Linkedin className="w-4 h-4" /> LinkedIn Profile
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:underline">
-                                        <Github className="w-4 h-4" /> GitHub Profile
-                                    </a>
-                                </li>
+                                {(candidate as any).portfolioUrl ? (
+                                    <li>
+                                        <a
+                                            href={(candidate as any).portfolioUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:underline break-all"
+                                        >
+                                            <FileText className="w-4 h-4 shrink-0" />
+                                            {(candidate as any).portfolioUrl.replace(/^https?:\/\//, '')}
+                                        </a>
+                                    </li>
+                                ) : (
+                                    <li className="text-sm text-slate-400 italic">No portfolio link submitted.</li>
+                                )}
+                                {(candidate as any).linkedinUrl && (
+                                    <li>
+                                        <a href={(candidate as any).linkedinUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:underline">
+                                            <Linkedin className="w-4 h-4" /> LinkedIn Profile
+                                        </a>
+                                    </li>
+                                )}
+                                {(candidate as any).githubUrl && (
+                                    <li>
+                                        <a href={(candidate as any).githubUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:underline">
+                                            <Github className="w-4 h-4" /> GitHub Profile
+                                        </a>
+                                    </li>
+                                )}
                             </ul>
                         </div>
                     </div>
@@ -77,10 +91,24 @@ const ApplicantReviewView = ({ candidate, onClose, onAccept, onDecline, isArchiv
                     {/* Application Info / Cover Letter */}
                     <div className="w-full md:w-2/3 md:pl-6 md:border-l md:border-slate-200 md:dark:border-slate-800 flex flex-col justify-between">
                         <div>
-                            <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-3">Cover Letter Note</h4>
-                            <div className="bg-white dark:bg-slate-800/80 p-5 rounded-xl border border-slate-200 dark:border-slate-700/80 prose prose-slate dark:prose-invert max-w-none text-sm text-slate-650 dark:text-slate-300 shadow-sm whitespace-pre-line leading-relaxed mb-6">
-                                {`Hi there,\n\nI am extremely interested in this role. I have previously completed ${candidate.completedProjects} project${candidate.completedProjects === 1 ? '' : 's'} related to ${candidate.domain}. My background at ${candidate.college} has prepared me well for the expectations listed in your project description.\n\nPlease find my resume attached. I am eager to discuss this further with you!\n\nBest regards,\n${candidate.name}`}
+                            <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-3">Cover Letter</h4>
+                            <div className="reading-mode bg-white dark:bg-slate-800/80 p-5 rounded-xl border border-slate-200 dark:border-slate-700/80 max-w-none shadow-sm whitespace-pre-line leading-relaxed mb-6 text-slate-700 dark:text-slate-300 text-sm">
+                                {(candidate as any).coverLetter
+                                    ? (candidate as any).coverLetter
+                                    : <span className="italic text-slate-400">No cover letter was submitted with this application.</span>
+                                }
                             </div>
+                            {(candidate as any).availability && (
+                                <div className="mb-4">
+                                    <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1">Availability</p>
+                                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 capitalize">
+                                        {(candidate as any).availability === 'immediate' ? 'Immediately Available' :
+                                         (candidate as any).availability === 'notice_2_weeks' ? 'Available in 2 Weeks' :
+                                         (candidate as any).availability === 'notice_1_month' ? 'Available in 1 Month' :
+                                         (candidate as any).availability}
+                                    </p>
+                                </div>
+                            )}
                         </div>
 
                         {/* Pipeline Stage Select Panel */}

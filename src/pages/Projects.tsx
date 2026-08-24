@@ -10,6 +10,7 @@ import ProjectDetailsModal from '../components/student/ProjectDetailsModal';
 import AlertModal from '../components/AlertModal';
 import { useEffect } from 'react';
 import { useInterviewStatus } from '../hooks/useInterviewStatus';
+import toast from 'react-hot-toast';
 
 const timeAgo = (dateInput?: string) => {
     if (!dateInput) return 'Recently';
@@ -82,6 +83,7 @@ const Projects = () => {
 
     // Live Projects State
     const [liveProjects, setLiveProjects] = useState<any[]>([]);
+    const [isLoadingProjects, setIsLoadingProjects] = useState(true); // FIX #8: loading state
 
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -116,6 +118,7 @@ const Projects = () => {
 
     useEffect(() => {
         const fetchProjects = async () => {
+            setIsLoadingProjects(true);
             try {
                 // Fetch active projects that are open
                 const { data: projectsData, error } = await supabase
@@ -188,6 +191,8 @@ const Projects = () => {
                 }
             } catch (err) {
                 console.error("Error fetching projects:", err);
+            } finally {
+                setIsLoadingProjects(false); // FIX #8: always clear loading
             }
         };
 
@@ -399,7 +404,18 @@ const Projects = () => {
                     <div className="absolute inset-0 bg-brand-500/5 dark:bg-brand-500/10 blur-[100px] rounded-full opacity-0 group-hover/grid:opacity-100 transition-opacity duration-1000 pointer-events-none"></div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
-                        {sortedProjects.length > 0 ? (
+                        {/* FIX #8: Show skeleton while projects are loading */}
+                        {isLoadingProjects ? (
+                            Array.from({ length: 6 }).map((_, i) => (
+                                <div key={i} className="glass-card p-4 sm:p-6 flex flex-col animate-pulse">
+                                    <div className="h-4 w-24 bg-slate-200 dark:bg-slate-800 rounded-full mb-5" />
+                                    <div className="h-6 w-3/4 bg-slate-200 dark:bg-slate-800 rounded-lg mb-3" />
+                                    <div className="h-4 w-1/2 bg-slate-100 dark:bg-slate-800/60 rounded mb-6" />
+                                    <div className="h-24 bg-slate-100 dark:bg-slate-800/40 rounded-xl mb-6" />
+                                    <div className="h-10 bg-slate-200 dark:bg-slate-800 rounded-xl mt-auto" />
+                                </div>
+                            ))
+                        ) : sortedProjects.length > 0 ? (
                             sortedProjects.map((project) => (
                                 <div
                                     key={project.id}
@@ -499,26 +515,41 @@ const Projects = () => {
                                                 >
                                                     Login to Apply <ArrowRight className="w-4 h-4 transition-transform" />
                                                 </button>
-                                            ) : (
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        if (!hasCompletedProfile) {
-                                                            navigate('/dashboard/student');
-                                                            return;
+                                            ) : (() => {
+                                                const isFull = (project.totalPositions - project.hiredPositions) <= 0;
+                                                const isClosed = interviewStatus === 'closed';
+                                                const isDisabled = isFull || isClosed;
+                                                return (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            if (!hasCompletedProfile) {
+                                                                // FIX #5: explain why instead of silent redirect
+                                                                toast('Complete your student profile first to apply to projects.', {
+                                                                    icon: '📋',
+                                                                    duration: 4000,
+                                                                });
+                                                                navigate('/student-profile-setup');
+                                                                return;
+                                                            }
+                                                            setApplyingProjectId(project.id);
+                                                        }}
+                                                        disabled={isDisabled}
+                                                        title={
+                                                            isFull ? 'All positions have been filled' :
+                                                            isClosed ? 'Your profile is closed to projects.' : ''
                                                         }
-                                                        setApplyingProjectId(project.id);
-                                                    }}
-                                                    disabled={interviewStatus === 'closed'}
-                                                    title={interviewStatus === 'closed' ? "Your profile is closed to projects." : ""}
-                                                    className={`w-full text-white py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 ${interviewStatus === 'closed'
-                                                        ? 'bg-slate-200 dark:bg-slate-850 text-slate-400 dark:text-slate-500 cursor-not-allowed'
-                                                        : 'bg-brand-600 hover:bg-brand-700 btn-interactive'
+                                                        className={`w-full text-white py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 ${
+                                                            isDisabled
+                                                                ? 'bg-slate-200 dark:bg-slate-850 text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                                                                : 'bg-brand-600 hover:bg-brand-700 btn-interactive'
                                                         }`}
-                                                >
-                                                    Apply Now <ArrowRight className="w-4 h-4 transition-transform" />
-                                                </button>
-                                            )}
+                                                    >
+                                                        {isFull ? 'Position Filled' : 'Apply Now'}
+                                                        {!isFull && <ArrowRight className="w-4 h-4 transition-transform" />}
+                                                    </button>
+                                                );
+                                            })()}
                                         </div>
                                     )}
                                 </div>

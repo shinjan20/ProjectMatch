@@ -15,13 +15,23 @@ import AuthCallback from './pages/AuthCallback';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import CompanyProfile from './pages/CompanyProfile';
+import NotFound from './pages/NotFound';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import ScrollToTop from './components/ScrollToTop';
 
 const ProtectedStudentRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, userRole, hasCompletedProfile } = useAuth();
+  const { isAuthenticated, userRole, hasCompletedProfile, isAuthLoading } = useAuth();
+
+  // FIX #17: Don't redirect until auth is confirmed — prevents flash of wrong route
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#0b0f19]">
+        <div className="w-8 h-8 border-2 border-brand-500/30 border-t-brand-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (!isAuthenticated) return <Navigate to="/login" />;
   if (userRole === 'student' && !hasCompletedProfile) return <Navigate to="/student-profile-setup" replace />;
@@ -63,8 +73,8 @@ function App() {
               <Route path="/company/:companyId" element={<CompanyProfile />} />
               <Route path="/settings" element={<Settings />} />
 
-              {/* Catch-all route for unknown paths */}
-              <Route path="*" element={<Home />} />
+              {/* Catch-all route — proper 404 page */}
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
           <Footer />
