@@ -15,6 +15,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { useCallback } from 'react';
+import EmptyState from '../components/ui/EmptyState';
 
 
 
@@ -1224,20 +1225,17 @@ const RecruiterDashboard = () => {
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
                             {/* Project List will go here */}
                             {activeProjects.length === 0 ? (
-                                <div className="text-center py-20 glass-card">
-                                    <Briefcase className="mx-auto h-12 w-12 text-slate-400 mb-4" />
-                                    <h3 className="text-lg font-medium text-slate-900 dark:text-white">No active projects</h3>
-                                    <p className="mt-2 text-slate-500 dark:text-slate-400">Get started by creating a new live project for students.</p>
-                                    <button
-                                        onClick={() => {
-                                            setEditingProjectData(null);
-                                            setIsPostProjectModalOpen(true);
-                                        }}
-                                        className="mt-6 inline-flex items-center justify-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-medium py-3 px-6 rounded-xl transition-all shadow-md hover:bg-slate-800 dark:hover:bg-slate-100 hover:-translate-y-0.5"
-                                    >
-                                        <PlusCircle className="w-5 h-5" /> Post New Project
-                                    </button>
-                                </div>
+                                <EmptyState
+                                    icon={Briefcase}
+                                    title="No active projects"
+                                    description="Get started by creating a new live project for students."
+                                    actionLabel="Post New Project"
+                                    actionIcon={PlusCircle}
+                                    onAction={() => {
+                                        setEditingProjectData(null);
+                                        setIsPostProjectModalOpen(true);
+                                    }}
+                                />
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {activeProjects.map(project => (

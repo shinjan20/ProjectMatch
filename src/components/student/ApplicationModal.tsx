@@ -7,6 +7,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import toast from 'react-hot-toast';
 import { calculateMatchScore } from '../../utils/aiMatch';
+import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 
 interface ApplicationModalProps {
     isOpen: boolean;
@@ -38,6 +39,9 @@ export default function ApplicationModal({ isOpen, onClose, projectId, project: 
     const [availability, setAvailability] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
+    
+    // Add escape to close shortcut
+    useKeyboardShortcut('Escape', onClose, { enabled: isOpen });
     const [matchScore, setMatchScore] = useState<number | null>(null);
     const [matchFeedback, setMatchFeedback] = useState<string>('');
     const [isCalculatingScore, setIsCalculatingScore] = useState(false);

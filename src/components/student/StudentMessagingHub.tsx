@@ -5,6 +5,7 @@ import { checkTextForProfanityAsync } from '../../utils/profanityFilter';
 import ProfanityWarningModal from '../ProfanityWarningModal';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
+import EmptyState from '../ui/EmptyState';
 
 interface StudentMessagingHubProps {
     threads: any[];
@@ -144,10 +145,12 @@ const StudentMessagingHub = ({ threads }: StudentMessagingHubProps) => {
 
     if (threads.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center py-24 text-slate-500 border rounded-3xl bg-white shadow-sm mt-4">
-                <MessageSquare className="w-16 h-16 mb-4 text-slate-300" />
-                <h3 className="text-xl font-bold text-slate-900 mb-2">No Messages Yet</h3>
-                <p>When a recruiter contacts you about an application, it will appear here.</p>
+            <div className="mt-4">
+                <EmptyState
+                    icon={MessageSquare}
+                    title="No Messages Yet"
+                    description="When a recruiter contacts you about an application, it will appear here."
+                />
             </div>
         );
     }

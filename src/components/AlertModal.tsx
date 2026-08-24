@@ -1,4 +1,5 @@
 import { CheckCircle2, AlertTriangle, Info, X } from 'lucide-react';
+import { useKeyboardShortcut } from '../hooks/useKeyboardShortcut';
 
 interface AlertModalProps {
     isOpen: boolean;
@@ -15,6 +16,8 @@ const AlertModal = ({
     type = 'info',
     onClose
 }: AlertModalProps) => {
+    useKeyboardShortcut('Escape', onClose, { enabled: isOpen });
+
     if (!isOpen) return null;
 
     const buttonColors = {

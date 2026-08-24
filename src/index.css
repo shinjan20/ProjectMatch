@@ -106,6 +106,18 @@
     line-height: 1.65;
     max-width: 72ch; /* Soft cap — override with .prose-full for wide layouts */
   }
+  /* Reading-Heavy Workflows typography */
+  .prose-reading {
+    font-family: 'Inter', sans-serif;
+    max-width: 65ch;
+    line-height: 1.75;
+    font-size: 1.05rem;
+    color: theme('colors.slate.700');
+  }
+
+  .dark .prose-reading {
+    color: theme('colors.slate.300');
+  }
 }
 
 @layer utilities {

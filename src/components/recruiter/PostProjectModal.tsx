@@ -5,6 +5,7 @@ import { DOMAINS } from '../../constants';
 import { checkFormForProfanityAsync } from '../../utils/profanityFilter';
 import ProfanityWarningModal from '../ProfanityWarningModal';
 import { useAuth } from '../../contexts/AuthContext';
+import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 
 export interface ProjectFormData {
     id?: string;
@@ -27,6 +28,9 @@ interface PostProjectModalProps {
 }
 
 const PostProjectModal = ({ isOpen, onClose, onSubmit, editingProject }: PostProjectModalProps) => {
+    // Add escape to close shortcut
+    useKeyboardShortcut('Escape', onClose, { enabled: isOpen });
+
     const [formData, setFormData] = useState({
         role: '',
         domain: '',

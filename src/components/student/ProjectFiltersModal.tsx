@@ -1,4 +1,5 @@
 import { X, Filter, SlidersHorizontal, MapPin, Clock, Banknote } from 'lucide-react';
+import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 
 interface ProjectFiltersModalProps {
     isOpen: boolean;
@@ -28,6 +29,9 @@ const COMMITMENTS = ['< 10 hrs/week', '10-20 hrs/week', '20+ hrs/week'];
 const DEADLINES = ['Closing soon (7 days)', 'Closing soon (30 days)'];
 
 export default function ProjectFiltersModal({ isOpen, onClose, filters, onFiltersChange }: ProjectFiltersModalProps) {
+    // Add escape to close shortcut
+    useKeyboardShortcut('Escape', onClose, { enabled: isOpen });
+
     if (!isOpen) return null;
 
     const toggleDuration = (duration: string) => {

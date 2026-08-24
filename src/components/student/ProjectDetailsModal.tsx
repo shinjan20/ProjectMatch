@@ -2,6 +2,7 @@ import { X, Clock, Banknote, Calendar, Home as HomeIcon, MapPin, Tag, Users, Shi
 import { MOCK_PROJECTS } from '../../constants';
 import { useAuth } from '../../contexts/AuthContext';
 import { useInterviewStatus } from '../../hooks/useInterviewStatus';
+import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 
 interface ProjectDetailsModalProps {
     isOpen: boolean;
@@ -20,13 +21,20 @@ const timeAgo = (dateInput?: string) => {
     return 'Recently';
 };
 
-export default function ProjectDetailsModal({ isOpen, onClose, projectId, project: passedProject, onApplyClicked }: ProjectDetailsModalProps) {
+export default function ProjectDetailsModal({ isOpen, onClose, projectId, project, onApplyClicked }: ProjectDetailsModalProps) {
     const { isAuthenticated, userRole } = useAuth();
 
     if (!isOpen) return null;
 
-    const project = passedProject || MOCK_PROJECTS.find(p => p.id === projectId);
-    if (!project) return null;
+    // Support both string UUIDs and numeric IDs for backwards compatibility
+    const numericId = typeof projectId === 'string' ? parseInt(projectId) : projectId;
+    
+    // Add escape to close shortcut
+    useKeyboardShortcut('Escape', onClose, { enabled: isOpen });
+
+    // Prefer the passed-in project data (from Supabase), fallback to MOCK_PROJECTS
+    const projectData = project || MOCK_PROJECTS.find(p => p.id === numericId);
+    if (!projectData) return null;
 
     const { interviewStatus } = useInterviewStatus();
 
@@ -94,7 +102,7 @@ export default function ProjectDetailsModal({ isOpen, onClose, projectId, projec
                                 <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center">
                                     <Zap className="w-5 h-5 mr-2 text-brand-500" /> About the Project
                                 </h3>
-                                <div className="prose prose-slate dark:prose-invert max-w-none text-slate-600 dark:text-slate-300">
+                                <div className="prose-reading">
                                     <p>
                                         We are looking for an enthusiastic individual to join our team for the <strong>{project.title}</strong> live project.
                                         You will be working directly with our core team to design, engineer, and iterate on actual product deliverables.

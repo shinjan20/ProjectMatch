@@ -8,6 +8,7 @@ import ProjectFiltersModal from '../components/student/ProjectFiltersModal';
 import ApplicationModal from '../components/student/ApplicationModal';
 import ProjectDetailsModal from '../components/student/ProjectDetailsModal';
 import AlertModal from '../components/AlertModal';
+import EmptyState from '../components/ui/EmptyState';
 import { useEffect } from 'react';
 import { useInterviewStatus } from '../hooks/useInterviewStatus';
 import toast from 'react-hot-toast';
@@ -555,19 +556,14 @@ const Projects = () => {
                                 </div>
                             ))
                         ) : (
-                            <div className="col-span-full py-24 glass-card text-center flex flex-col items-center justify-center min-h-[400px]">
-                                <div className="bg-slate-100 dark:bg-slate-800 p-6 rounded-full mb-6 relative">
-                                    <div className="absolute inset-0 bg-brand-500/20 blur-xl rounded-full"></div>
-                                    <Search className="w-10 h-10 text-slate-400 relative z-10" />
-                                </div>
-                                <h3 className="text-2xl font-bold font-heading text-slate-900 dark:text-white mb-3">No matching projects</h3>
-                                <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">We couldn't find anything matching your current filters. Try broadening your search terms.</p>
-                                <button
-                                    onClick={() => { setSearchTerm(''); setSelectedCategory('All'); }}
-                                    className="mt-8 text-white bg-brand-600 hover:bg-brand-500 font-medium px-6 py-3 rounded-full transition-all shadow-lg shadow-brand-500/20 btn-interactive"
-                                >
-                                    Reset all filters
-                                </button>
+                            <div className="col-span-full py-10">
+                                <EmptyState
+                                    icon={Search}
+                                    title="No matching projects"
+                                    description="We couldn't find anything matching your current filters. Try broadening your search terms."
+                                    actionLabel="Reset all filters"
+                                    onAction={() => { setSearchTerm(''); setSelectedCategory('All'); }}
+                                />
                             </div>
                         )}
                     </div>

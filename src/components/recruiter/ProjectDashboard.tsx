@@ -3,6 +3,7 @@ import { X, Briefcase, MapPin, Clock, Users, FileText, Download, CheckSquare, Sq
 import type { StudentProfile } from './StudentProfileCard';
 import ApplicantReviewView from './ApplicantReviewView';
 import WorkingCandidateView from './WorkingCandidateView';
+import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 
 interface ProjectDashboardProps {
     isOpen: boolean;
@@ -46,6 +47,30 @@ const ProjectDashboard = ({ isOpen, onClose, project, onArchive, onAcceptCandida
         setCompareIds([]);
         setShowCompareModal(false);
     };
+
+    // Determine current list based on activeTab
+    const currentCandidates = activeTab === 'applicants' 
+        ? (project.appliedCandidates || []) 
+        : activeTab === 'working' 
+            ? (project.workingCandidates || []) 
+            : (project.archivedCandidates || []);
+
+    const navigateCandidate = (direction: 'next' | 'prev') => {
+        if (!reviewingCandidate) return;
+        
+        const currentIndex = currentCandidates.findIndex((c: any) => c.id === reviewingCandidate.id);
+        if (currentIndex === -1) return;
+        
+        let newIndex = direction === 'next' ? currentIndex + 1 : currentIndex - 1;
+        
+        if (newIndex < 0) newIndex = currentCandidates.length - 1;
+        if (newIndex >= currentCandidates.length) newIndex = 0;
+        
+        setReviewingCandidate(currentCandidates[newIndex]);
+    };
+
+    useKeyboardShortcut('ArrowRight', () => navigateCandidate('next'), { enabled: !!reviewingCandidate });
+    useKeyboardShortcut('ArrowLeft', () => navigateCandidate('prev'), { enabled: !!reviewingCandidate });
 
     if (!isOpen || !project) return null;
 

@@ -92,7 +92,7 @@ const ApplicantReviewView = ({ candidate, onClose, onAccept, onDecline, isArchiv
                     <div className="w-full md:w-2/3 md:pl-6 md:border-l md:border-slate-200 md:dark:border-slate-800 flex flex-col justify-between">
                         <div>
                             <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-3">Cover Letter</h4>
-                            <div className="reading-mode bg-white dark:bg-slate-800/80 p-5 rounded-xl border border-slate-200 dark:border-slate-700/80 max-w-none shadow-sm whitespace-pre-line leading-relaxed mb-6 text-slate-700 dark:text-slate-300 text-sm">
+                            <div className="prose-reading bg-white dark:bg-slate-800/80 p-5 rounded-xl border border-slate-200 dark:border-slate-700/80 max-w-none shadow-sm whitespace-pre-line mb-6 text-slate-700 dark:text-slate-300">
                                 {(candidate as any).coverLetter
                                     ? (candidate as any).coverLetter
                                     : <span className="italic text-slate-400">No cover letter was submitted with this application.</span>
