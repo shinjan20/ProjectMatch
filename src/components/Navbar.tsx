@@ -277,16 +277,18 @@ const Navbar = () => {
                         </div>
                     </div>
 
-                    <div className="md:hidden flex items-center">
-                        <button onClick={() => setIsOpen(!isOpen)} className="text-slate-600 dark:text-slate-300 hover:text-slate-900 focus:outline-none">
-                            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-                        </button>
-                    </div>
+                    {!isAuthenticated && (
+                        <div className="md:hidden flex items-center">
+                            <button onClick={() => setIsOpen(!isOpen)} className="text-slate-600 dark:text-slate-300 hover:text-slate-900 focus:outline-none">
+                                {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
 
-            {/* Mobile menu */}
-            {isOpen && (
+            {/* Mobile menu - Only for unauthenticated users now, as authenticated use BottomNav */}
+            {isOpen && !isAuthenticated && (
                 <div className="md:hidden glass mt-2 rounded-2xl border border-white/20 dark:border-slate-800/60 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
                     <div className="px-2 pt-2 pb-6 space-y-1 sm:px-3">
                         {!isAuthenticated && (

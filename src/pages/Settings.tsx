@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { User, Briefcase, Mail, Globe, Save, Lock, Building2, BookOpen, Link as LinkIcon, AlertCircle } from 'lucide-react';
+import { User, Briefcase, Mail, Globe, Save, Lock, Building2, BookOpen, Link as LinkIcon, AlertCircle, LogOut } from 'lucide-react';
 import { checkFormForProfanityAsync } from '../utils/profanityFilter';
 import ProfanityWarningModal from '../components/ProfanityWarningModal';
 import { getPasswordStrength, type PasswordStrength } from '../utils/passwordStrength';
@@ -18,7 +18,7 @@ const DOMAINS = [
 ];
 
 const Settings = () => {
-    const { userRole, userName, userEmail, login, updatePassword } = useAuth();
+    const { userRole, userName, userEmail, login, updatePassword, logout } = useAuth();
 
     // Form State
     const [name, setName] = useState(userName);
@@ -390,6 +390,22 @@ const Settings = () => {
                                     Update Password
                                 </button>
                             </form>
+                        </div>
+                    </div>
+
+                    {/* Account Actions */}
+                    <div className="lg:col-span-3 mt-4">
+                        <div className="glass-card p-6 md:p-8 border-red-200/50 dark:border-red-900/30">
+                            <h2 className="text-xl font-bold font-heading text-red-600 dark:text-red-400 mb-4 border-b border-red-100 dark:border-red-900/20 pb-4">Account Actions</h2>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+                                Sign out of your account on this device.
+                            </p>
+                            <button
+                                onClick={logout}
+                                className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 rounded-xl font-bold transition-colors border border-red-200 dark:border-red-800/50"
+                            >
+                                <LogOut className="w-5 h-5" /> Sign Out
+                            </button>
                         </div>
                     </div>
 
