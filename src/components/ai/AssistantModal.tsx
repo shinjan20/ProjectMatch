@@ -156,7 +156,7 @@ export default function AssistantModal({ isOpen, onClose }: AssistantModalProps)
             />
 
             {/* Modal Box - Premium glass surfaces */}
-            <div className={`relative w-full sm:max-w-3xl bg-white/95 dark:bg-[#0a0f1c]/95 backdrop-blur-xl sm:rounded-xl rounded-t-2xl shadow-2xl shadow-slate-900/20 border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all duration-300 ease-out flex flex-col font-sans animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-0 sm:zoom-in-95 h-auto max-h-[95dvh] sm:max-h-[70vh]`}>
+            <div className={`relative z-10 w-full sm:max-w-3xl bg-white/95 dark:bg-[#0a0f1c]/95 backdrop-blur-xl sm:rounded-xl rounded-t-2xl shadow-2xl shadow-slate-900/20 border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all duration-300 ease-out flex flex-col font-sans animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-0 sm:zoom-in-95 h-auto max-h-[95dvh] sm:max-h-[70vh]`}>
                 
                 {/* Header */}
                 <div className="px-5 py-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900 shrink-0">
