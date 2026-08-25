@@ -67,18 +67,22 @@ const StudentProfileModal = ({ isOpen, onClose, profile, hasActiveProjects, acti
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto"
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto"
             onClick={handleClose}
         >
             <div
-                className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-3xl shadow-2xl relative overflow-hidden mt-10 mb-10 border border-slate-200 dark:border-slate-800"
+                className="bg-white dark:bg-slate-900 w-full sm:max-w-2xl h-[90vh] sm:h-auto rounded-t-3xl sm:rounded-3xl shadow-2xl relative overflow-y-auto sm:overflow-hidden sm:mt-10 sm:mb-10 border border-slate-200 dark:border-slate-800 animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300"
                 onClick={(e) => e.stopPropagation()}
             >
+                {/* Mobile drag handle */}
+                <div className="w-full flex sm:hidden justify-center pt-3 pb-1" onClick={handleClose}>
+                    <div className="w-12 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700" />
+                </div>
 
                 {/* Close button */}
                 <button
                     onClick={handleClose}
-                    className="absolute top-4 right-4 z-50 text-slate-400 hover:text-slate-600 dark:hover:text-white bg-white/50 dark:bg-slate-900/50 backdrop-blur p-2 rounded-full transition-colors cursor-pointer"
+                    className="absolute top-4 sm:top-4 right-4 z-50 text-slate-400 hover:text-slate-600 dark:hover:text-white bg-white/50 dark:bg-slate-900/50 backdrop-blur p-2 rounded-full transition-colors cursor-pointer"
                 >
                     <X className="w-5 h-5" />
                 </button>

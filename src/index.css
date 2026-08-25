@@ -45,6 +45,10 @@
   --surface-d0: #0b0f19;
   --surface-d1: #111827;
   --surface-d2: #1e293b;
+
+  /* Spatial Tokens for Mobile/Layout overlap prevention */
+  --mobile-nav-height: 72px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 @layer base {

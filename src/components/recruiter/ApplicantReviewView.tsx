@@ -1,4 +1,5 @@
-import { X, FileText, User, Github, Linkedin, GraduationCap } from 'lucide-react';
+import { useState } from 'react';
+import { X, FileText, User, Github, Linkedin, GraduationCap, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
 import type { StudentProfile } from './StudentProfileCard';
 
 interface ApplicantReviewViewProps {
@@ -9,26 +10,52 @@ interface ApplicantReviewViewProps {
     isArchived?: boolean;
     onRevert?: (candidateId: string) => void;
     onUpdateStage?: (candidateId: string, stage: string) => void;
+    onNext?: () => void;
+    onPrev?: () => void;
 }
 
-const ApplicantReviewView = ({ candidate, onClose, onAccept, onDecline, isArchived: _isArchived = false, onRevert: _onRevert, onUpdateStage }: ApplicantReviewViewProps) => {
+const ApplicantReviewView = ({ candidate, onClose, onAccept, onDecline, isArchived: _isArchived = false, onRevert: _onRevert, onUpdateStage, onNext, onPrev }: ApplicantReviewViewProps) => {
+    const [showDeclineConfirm, setShowDeclineConfirm] = useState(false);
+
     return (
-        <div className="fixed inset-y-0 right-0 z-[100] w-full md:w-[600px] lg:w-[700px] bg-slate-50 dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl animate-in slide-in-from-right duration-300 flex flex-col h-full">
-            {/* Backdrop overlay (optional if handled by parent, but good for isolated closing) */}
-            <div className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm -z-10" onClick={onClose} />
+        <div className="fixed inset-0 z-[100] flex items-end md:items-stretch md:justify-end bg-slate-900/40 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none" onClick={onClose}>
+            {/* Desktop Backdrop overlay */}
+            <div className="fixed inset-0 bg-transparent md:bg-slate-900/20 md:backdrop-blur-sm -z-10 hidden md:block" onClick={onClose} />
             
-            {/* Header */}
-            <div className="px-6 py-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800">
-                <div className="flex items-center gap-3">
-                    <User className="w-5 h-5 text-brand-500" />
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">Reviewing Applicant</h3>
+            <div 
+                className="w-full md:w-[600px] lg:w-[700px] max-h-[95vh] md:max-h-none h-auto md:h-full bg-slate-50 dark:bg-slate-900 rounded-t-3xl md:rounded-none border-t md:border-t-0 md:border-l border-slate-200 dark:border-slate-800 shadow-2xl animate-in slide-in-from-bottom-full md:slide-in-from-right duration-300 flex flex-col"
+                onClick={e => e.stopPropagation()}
+            >
+                {/* Mobile drag handle */}
+                <div className="w-full flex md:hidden justify-center pt-3 pb-1" onClick={onClose}>
+                    <div className="w-12 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700" />
                 </div>
-                <button
-                    onClick={onClose}
-                    className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                >
-                    <X className="w-5 h-5" />
-                </button>
+
+                {/* Header */}
+                <div className="px-6 py-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 md:bg-transparent rounded-t-3xl md:rounded-none">
+                <div className="flex items-center gap-3">
+                    <User className="w-5 h-5 text-brand-500 hidden sm:block" />
+                    <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">Reviewing Applicant</h3>
+                </div>
+                <div className="flex items-center gap-1">
+                    {onPrev && (
+                        <button onClick={onPrev} className="p-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                            <ChevronLeft className="w-5 h-5" />
+                        </button>
+                    )}
+                    {onNext && (
+                        <button onClick={onNext} className="p-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                            <ChevronRight className="w-5 h-5" />
+                        </button>
+                    )}
+                    <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1"></div>
+                    <button
+                        onClick={onClose}
+                        className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
             </div>
 
             {/* Content Area */}
@@ -130,22 +157,53 @@ const ApplicantReviewView = ({ candidate, onClose, onAccept, onDecline, isArchiv
                                     const currentStatus = (candidate as any).applicationStatus || 'pending';
                                     const isCurrent = currentStatus === item.status;
                                     
+                                    if (item.status === 'rejected' && showDeclineConfirm) {
+                                        return (
+                                            <div key="confirm-reject" className="col-span-full flex items-center justify-between p-2 mt-2 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-xl animate-in fade-in zoom-in-95 duration-200">
+                                                <div className="flex items-center gap-2 text-red-600 dark:text-red-400 text-xs font-bold px-2">
+                                                    <AlertTriangle className="w-4 h-4" /> Sure you want to decline?
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <button 
+                                                        onClick={() => setShowDeclineConfirm(false)}
+                                                        className="px-3 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => {
+                                                            setShowDeclineConfirm(false);
+                                                            if (onUpdateStage) onUpdateStage(candidate.id, 'rejected');
+                                                            else onDecline(candidate.id);
+                                                        }}
+                                                        className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                                                    >
+                                                        Yes, Decline
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+
                                     return (
                                         <button
                                             key={item.status}
                                             onClick={() => {
+                                                if (item.status === 'rejected') {
+                                                    setShowDeclineConfirm(true);
+                                                    return;
+                                                }
                                                 if (onUpdateStage) {
                                                     onUpdateStage(candidate.id, item.status);
                                                 } else {
                                                     if (item.status === 'accepted') onAccept(candidate.id);
-                                                    else if (item.status === 'rejected') onDecline(candidate.id);
                                                 }
                                             }}
                                             className={`px-3 py-2 border rounded-xl text-xs font-bold text-center transition-all ${
                                                 isCurrent 
                                                     ? `${item.color} shadow-sm ring-2 ring-brand-500/20`
                                                     : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-slate-350 dark:hover:border-slate-700'
-                                            }`}
+                                            } ${showDeclineConfirm ? 'opacity-50 pointer-events-none' : ''}`}
                                         >
                                             {item.label}
                                         </button>
@@ -155,6 +213,7 @@ const ApplicantReviewView = ({ candidate, onClose, onAccept, onDecline, isArchiv
                         </div>
                     </div>
                 </div>
+            </div>
             </div>
         </div>
     );

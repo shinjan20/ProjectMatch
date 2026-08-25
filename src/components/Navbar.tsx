@@ -1,4 +1,5 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { Menu, X, LogOut, User as UserIcon, Settings as SettingsIcon, MoreHorizontal, Check, XCircle, CheckCircle2, Bell, SquareTerminal } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
@@ -60,14 +61,19 @@ const Navbar = () => {
     };
 
     const handleLogout = async () => {
+        const loadingToast = toast.loading('Logging out...');
         try {
             await logout();
+            toast.success('Logged out successfully', { id: loadingToast });
         } catch (error) {
             console.error("Logout failed in Navbar:", error);
+            toast.error('Logout failed', { id: loadingToast });
         } finally {
             setShowProfileMenu(false);
             setIsOpen(false);
-            window.location.href = '/'; // Hard refresh to ensure all states are cleared 
+            setTimeout(() => {
+                window.location.href = '/'; // Hard refresh to ensure all states are cleared 
+            }, 800);
         }
     };
 

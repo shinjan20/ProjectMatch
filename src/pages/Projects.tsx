@@ -386,6 +386,33 @@ const Projects = () => {
                                     <option value="deadline">Closing Soon</option>
                                 </select>
                             </div>
+
+                            {/* Inline Filters */}
+                            <div className="hidden lg:flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full px-3.5 py-1.5 ml-2">
+                                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Comp:</span>
+                                <select
+                                    value={activeFilters.stipend}
+                                    onChange={(e) => setActiveFilters(prev => ({ ...prev, stipend: e.target.value }))}
+                                    className="text-xs font-bold text-slate-700 dark:text-slate-300 bg-transparent border-none outline-none focus:ring-0 cursor-pointer w-20"
+                                >
+                                    <option value="">Any</option>
+                                    <option value="1">Paid Only</option>
+                                </select>
+                            </div>
+                            <div className="hidden lg:flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full px-3.5 py-1.5 ml-2">
+                                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Time:</span>
+                                <select
+                                    value={activeFilters.duration[0] || ''}
+                                    onChange={(e) => setActiveFilters(prev => ({ ...prev, duration: e.target.value ? [e.target.value] : [] }))}
+                                    className="text-xs font-bold text-slate-700 dark:text-slate-300 bg-transparent border-none outline-none focus:ring-0 cursor-pointer w-24"
+                                >
+                                    <option value="">Any Duration</option>
+                                    <option value="1 months">1 month</option>
+                                    <option value="2 months">2 months</option>
+                                    <option value="3 months">3 months</option>
+                                    <option value="6 months">6 months</option>
+                                </select>
+                            </div>
                             <button
                                 onClick={() => setIsFiltersModalOpen(true)}
                                 className="flex items-center gap-2 px-4 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-full text-sm font-medium transition-all shadow-xl shadow-slate-900/10 btn-interactive ml-2 relative"
@@ -429,8 +456,11 @@ const Projects = () => {
                                                 {project.category}
                                             </span>
                                             {userRole === 'student' && (
-                                                <span className="inline-flex px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-wider border border-emerald-200/50 dark:border-emerald-900/30">
-                                                    ★ Fit: {getMatchScore(project)}%
+                                                <span 
+                                                    className="inline-flex px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-wider border border-emerald-200/50 dark:border-emerald-900/30 cursor-help"
+                                                    title="Based on the skills and domain currently in your profile."
+                                                >
+                                                    ★ {getMatchScore(project) >= 80 ? 'High Fit' : getMatchScore(project) >= 65 ? 'Good Fit' : 'Partial Fit'}
                                                 </span>
                                             )}
                                         </div>

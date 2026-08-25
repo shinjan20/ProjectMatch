@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { Briefcase, CheckCircle2, Archive, Clock, Home, Banknote, Calendar, Tag, X, CalendarCheck, MessageSquare, Download, XCircle, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import StudentMessagingHub from '../components/student/StudentMessagingHub';
 import toast from 'react-hot-toast';
+import PageSkeleton from '../components/common/PageSkeleton';
 
 const timeAgo = (dateInput?: string) => {
     if (!dateInput) return 'Recently';
@@ -57,6 +58,8 @@ export default function StudentDashboard() {
     const [archivedProjects, setArchivedProjects] = useState<any[]>([]);
 
     const [threads, setThreads] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
     // FIX #12: fetch skills from Supabase profile, not stale localStorage
     const [studentProfileSkills, setStudentProfileSkills] = useState<string[]>([]);
 
@@ -195,13 +198,14 @@ export default function StudentDashboard() {
         };
     }, [userId]);
 
-    useEffect(() => {
-        const fetchStudentData = async () => {
-            if (!userId) {
-                return;
-            }
+    const fetchStudentData = useCallback(async () => {
+        if (!userId) {
+            setIsLoading(false);
+            return;
+        }
 
-            try {
+        try {
+            setIsLoading(true);
                 // Fetch applications joined with their respective projects
                 const { data: applicationsData, error } = await supabase
                     .from('applications')
@@ -297,9 +301,12 @@ export default function StudentDashboard() {
             } catch (err: any) {
                 console.error("Error fetching student dashboard:", err);
                 toast.error("Failed to load your applications.");
+            } finally {
+                setIsLoading(false);
             }
-        };
+    }, [userId]);
 
+    useEffect(() => {
         fetchStudentData();
 
         // FIX #14: Subscribe to application updates for real-time notifications
@@ -330,7 +337,18 @@ export default function StudentDashboard() {
         return () => {
             supabase.removeChannel(appsChannel);
         };
-    }, [userId]);
+    }, [userId, activeTab, fetchStudentData]);
+
+    if (isLoading) {
+        return (
+            <div className="pt-24 pb-12 bg-slate-50 dark:bg-[#0a0f1c] min-h-screen">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white font-serif mb-2">My Applications</h1>
+                </div>
+                <PageSkeleton type="dashboard" />
+            </div>
+        );
+    }
 
     if (userRole !== 'student') {
         return (

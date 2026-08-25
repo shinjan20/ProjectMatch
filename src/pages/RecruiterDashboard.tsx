@@ -16,11 +16,14 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { useCallback } from 'react';
 import EmptyState from '../components/ui/EmptyState';
-
+import PageSkeleton from '../components/common/PageSkeleton';
 
 
 const RecruiterDashboard = () => {
     const { userName, userId } = useAuth();
+    const location = useLocation();
+    
+    // Default to projects, but let hash override if present
     const [activeTab, setActiveTab] = useState<'projects' | 'talent' | 'collaborated' | 'messages' | 'analytics'>('projects');
     const [selectedProject, setSelectedProject] = useState<any | null>(null);
     const [targetMessageThreadId, setTargetMessageThreadId] = useState<string | null>(null);
@@ -28,6 +31,7 @@ const RecruiterDashboard = () => {
     const [archivedProjects, setArchivedProjects] = useState<any[]>([]);
     const [threads, setThreads] = useState<any[]>([]);
     const [collaboratedTalent, setCollaboratedTalent] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     // Discover Talent State
     const [talentProfiles, setTalentProfiles] = useState<any[]>([]);
@@ -38,10 +42,20 @@ const RecruiterDashboard = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [activeTab]);
 
+    // Sync tab with hash route
+    useEffect(() => {
+        const hash = location.hash.replace('#', '');
+        if (hash === 'projects') setActiveTab('projects');
+        else if (hash === 'candidates') setActiveTab('talent');
+        else if (hash === 'inbox') setActiveTab('messages');
+        else if (hash === 'analytics') setActiveTab('analytics');
+    }, [location.hash]);
+
     const fetchRecruiterData = useCallback(async () => {
         if (!userId) return;
 
         try {
+            setIsLoading(true);
             // Fetch all projects created by this recruiter
             const { data: projectsData, error: projectsError } = await supabase
                 .from('projects')
@@ -138,12 +152,14 @@ const RecruiterDashboard = () => {
         } catch (err) {
             console.error("Error fetching dashboard data:", err);
             toast.error("Failed to load your projects.");
+        } finally {
+            setIsLoading(false);
         }
     }, [userId]);
 
     useEffect(() => {
         fetchRecruiterData();
-    }, [userId, fetchRecruiterData]);
+    }, [userId, activeTab, fetchRecruiterData]);
 
     // Fetch and subscribe to Message Threads
     useEffect(() => {
@@ -261,7 +277,6 @@ const RecruiterDashboard = () => {
         fetchProfiles();
     }, []);
 
-    const location = useLocation();
 
     // Check if we just navigated from a successful new recruiter registration
     useEffect(() => {
@@ -1067,8 +1082,19 @@ const RecruiterDashboard = () => {
         );
     };
 
+    if (isLoading) {
+        return (
+            <div className="pt-24 pb-12 bg-slate-50 dark:bg-slate-900 min-h-screen">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white font-serif mb-2">My Desk</h1>
+                </div>
+                <PageSkeleton type="dashboard" />
+            </div>
+        );
+    }
+
     return (
-        <div className="min-h-screen pt-24 pb-12 bg-slate-50 dark:bg-slate-950">
+        <div className="min-h-screen pt-24 pb-24 md:pb-12 bg-slate-50 dark:bg-slate-950">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
                 {/* Dashboard Header */}
@@ -1139,7 +1165,7 @@ const RecruiterDashboard = () => {
                 })()}
 
                 {/* Navigation Tabs */}
-                <div className="flex space-x-2 sm:space-x-8 border-b border-slate-200 dark:border-slate-800 mb-8 overflow-x-auto no-scrollbar mask-edges min-w-full">
+                <div className="hidden md:flex space-x-2 sm:space-x-8 border-b border-slate-200 dark:border-slate-800 mb-8 overflow-x-auto no-scrollbar mask-edges min-w-full">
                     <button
                         onClick={() => {
                             setTargetMessageThreadId(null);

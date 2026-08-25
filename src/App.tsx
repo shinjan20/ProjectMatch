@@ -18,7 +18,7 @@ import CompanyProfile from './pages/CompanyProfile';
 import NotFound from './pages/NotFound';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import ScrollToTop from './components/ScrollToTop';
 import ErrorBoundary from './components/ErrorBoundary';
 import StudentBottomNav from './components/navigation/StudentBottomNav';
@@ -42,6 +42,13 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+const AuthRedirect = ({ to }: { to: string }) => {
+  React.useEffect(() => {
+    toast.error("Please log in to access this page", { id: 'auth-redirect' });
+  }, []);
+  return <Navigate to={to} replace />;
+};
+
 const ProtectedStudentRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, userRole, hasCompletedProfile, isAuthLoading } = useAuth();
 
@@ -54,8 +61,24 @@ const ProtectedStudentRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  if (!isAuthenticated) return <Navigate to="/login" />;
+  if (!isAuthenticated) return <AuthRedirect to="/login" />;
   if (userRole === 'student' && !hasCompletedProfile) return <Navigate to="/student-profile-setup" replace />;
+
+  return <>{children}</>;
+};
+
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, isAuthLoading } = useAuth();
+
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#0b0f19]">
+        <div className="w-8 h-8 border-2 border-brand-500/30 border-t-brand-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) return <AuthRedirect to="/login" />;
 
   return <>{children}</>;
 };
@@ -89,9 +112,9 @@ function App() {
               <Route path="/student-profile-setup" element={<StudentProfileForm />} />
               <Route path="/dashboard/student" element={<ProtectedStudentRoute><StudentDashboard /></ProtectedStudentRoute>} />
               <Route path="/completed-projects" element={<ProtectedStudentRoute><CompletedProjects /></ProtectedStudentRoute>} />
-              <Route path="/dashboard/recruiter" element={<RecruiterDashboard />} />
-              <Route path="/company/:companyId" element={<CompanyProfile />} />
-              <Route path="/settings" element={<Settings />} />
+              <Route path="/dashboard/recruiter" element={<ProtectedRoute><RecruiterDashboard /></ProtectedRoute>} />
+              <Route path="/company/:companyId" element={<ProtectedRoute><CompanyProfile /></ProtectedRoute>} />
+              <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
 
               {/* Catch-all route — proper 404 page */}
               <Route path="*" element={<NotFound />} />

@@ -253,12 +253,12 @@ export default function ApplicationModal({ isOpen, onClose, projectId, project: 
                                         <div className="flex items-start justify-between">
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2 mb-2">
-                                                    <span className={`text-xs font-bold px-2 py-0.5 rounded ${
+                                                    <span className={`text-xs font-bold px-2 py-0.5 rounded cursor-help ${
                                                         matchScore >= 80 ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400' :
                                                         matchScore >= 50 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400' :
                                                         'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'
-                                                    }`}>
-                                                        {matchScore}% Match
+                                                    }`} title="Based on information currently in your profile.">
+                                                        {matchScore >= 80 ? 'High Fit' : matchScore >= 50 ? 'Good Fit' : 'Partial Fit'}
                                                     </span>
                                                     <span className="text-xs text-slate-500 font-medium">AI Feedback Helper</span>
                                                 </div>

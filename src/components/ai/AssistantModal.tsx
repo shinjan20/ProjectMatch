@@ -13,7 +13,7 @@ interface AssistantModalProps {
 interface Message {
     id: string;
     role: 'user' | 'assistant';
-    content?: string;
+    content?: string | React.ReactNode;
     structuredData?: AIResponse;
     loading?: boolean;
 }
@@ -23,7 +23,17 @@ export default function AssistantModal({ isOpen, onClose }: AssistantModalProps)
         {
             id: '1',
             role: 'assistant',
-            content: "Welcome to the ProjectMatch Command Workspace. You can search projects, find candidates, or ask about specific profiles."
+            content: (
+                <div className="space-y-3 mt-1">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">What do you want to figure out?</h3>
+                    <p className="text-slate-600 dark:text-slate-400">Find opportunities, evaluate candidates, or get help with your next decision.</p>
+                    <div className="flex flex-wrap gap-2 pt-3">
+                        <button className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md text-sm font-medium transition-colors border border-slate-200 dark:border-slate-700 flex items-center gap-2">Find the right project</button>
+                        <button className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md text-sm font-medium transition-colors border border-slate-200 dark:border-slate-700 flex items-center gap-2">Prioritize candidates</button>
+                        <button className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md text-sm font-medium transition-colors border border-slate-200 dark:border-slate-700 flex items-center gap-2">Explain a match</button>
+                    </div>
+                </div>
+            )
         }
     ]);
     const [input, setInput] = useState('');

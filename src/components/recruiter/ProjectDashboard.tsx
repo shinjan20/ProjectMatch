@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Briefcase, MapPin, Clock, Users, FileText, Download, CheckSquare, Square, GitCompare, ChevronRight } from 'lucide-react';
+import { X, Briefcase, MapPin, Clock, Users, FileText, Download, CheckSquare, Square, GitCompare } from 'lucide-react';
 import type { StudentProfile } from './StudentProfileCard';
 import ApplicantReviewView from './ApplicantReviewView';
 import WorkingCandidateView from './WorkingCandidateView';
@@ -31,7 +31,7 @@ const ProjectDashboard = ({ isOpen, onClose, project, onArchive, onAcceptCandida
         setCompareIds(prev =>
             prev.includes(id)
                 ? prev.filter(c => c !== id)
-                : prev.length < 3 ? [...prev, id] : prev
+                : [...prev, id]
         );
     };
 
@@ -115,7 +115,7 @@ const ProjectDashboard = ({ isOpen, onClose, project, onArchive, onAcceptCandida
                                                     ? 'text-brand-600 dark:text-brand-400'
                                                     : 'text-slate-300 dark:text-slate-600 hover:text-slate-500'
                                             }`}
-                                            title={compareIds.includes(candidate.id) ? 'Remove from comparison' : compareIds.length >= 3 ? 'Max 3 candidates' : 'Add to comparison'}
+                                            title={compareIds.includes(candidate.id) ? 'Remove selection' : 'Select candidate'}
                                         >
                                             {compareIds.includes(candidate.id)
                                                 ? <CheckSquare className="w-4 h-4" />
@@ -217,8 +217,10 @@ const ProjectDashboard = ({ isOpen, onClose, project, onArchive, onAcceptCandida
                                         <span className="font-bold text-slate-900 dark:text-white">{c.completedProjects}</span>
                                     </div>
                                     <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
-                                        <span className="text-slate-500 font-medium">AI Match</span>
-                                        <span className="font-bold text-slate-900 dark:text-white">{c.aiMatchScore ?? '—'}%</span>
+                                        <span className="text-slate-500 font-medium cursor-help" title="Based on candidate's skills and project requirements.">AI Fit</span>
+                                        <span className="font-bold text-slate-900 dark:text-white">
+                                            {c.aiMatchScore == null ? '—' : c.aiMatchScore >= 80 ? 'High Fit' : c.aiMatchScore >= 65 ? 'Good Fit' : 'Partial Fit'}
+                                        </span>
                                     </div>
                                     <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
                                         <span className="text-slate-500 font-medium">Status</span>
@@ -464,14 +466,24 @@ const ProjectDashboard = ({ isOpen, onClose, project, onArchive, onAcceptCandida
                         if (onUpdateCandidateStage) onUpdateCandidateStage(project.id, id, stage);
                         setReviewingCandidate(null);
                     }}
+                    onNext={() => navigateCandidate('next')}
+                    onPrev={() => navigateCandidate('prev')}
                 />
             )}
 
             {reviewingWorkingCandidate && (
-                <div className="fixed inset-y-0 right-0 z-[100] w-full md:w-[600px] lg:w-[700px] bg-slate-50 dark:bg-slate-900 shadow-2xl animate-in slide-in-from-right duration-300 h-full">
-                    <div className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm -z-10" onClick={() => setReviewingWorkingCandidate(null)} />
-                    <div className="h-full overflow-y-auto p-6">
-                        <button
+                <div className="fixed inset-0 z-[100] flex items-end md:items-stretch md:justify-end bg-slate-900/40 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none" onClick={() => setReviewingWorkingCandidate(null)}>
+                    <div className="fixed inset-0 bg-transparent md:bg-slate-900/20 md:backdrop-blur-sm -z-10 hidden md:block" onClick={() => setReviewingWorkingCandidate(null)} />
+                    
+                    <div 
+                        className="w-full md:w-[600px] lg:w-[700px] max-h-[95vh] md:max-h-none h-auto md:h-full bg-slate-50 dark:bg-slate-900 rounded-t-3xl md:rounded-none border-t md:border-t-0 md:border-l border-slate-200 dark:border-slate-800 shadow-2xl animate-in slide-in-from-bottom-full md:slide-in-from-right duration-300 flex flex-col"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <div className="w-full flex md:hidden justify-center pt-3 pb-1" onClick={() => setReviewingWorkingCandidate(null)}>
+                            <div className="w-12 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700" />
+                        </div>
+                        <div className="h-full overflow-y-auto p-6">
+                            <button
                             onClick={() => setReviewingWorkingCandidate(null)}
                             className="mb-4 text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white flex items-center gap-1 transition-colors"
                         >
@@ -490,27 +502,42 @@ const ProjectDashboard = ({ isOpen, onClose, project, onArchive, onAcceptCandida
                                 if (onCompleteProject) onCompleteProject(project.id, id);
                             }}
                         />
+                        </div>
                     </div>
                 </div>
             )}
 
-            {/* Floating Comparison Tray — appears when 2+ candidates are selected */}
-            {compareIds.length >= 2 && !showCompareModal && (
-                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[55] animate-in slide-in-from-bottom-4 fade-in duration-300">
-                    <div className="flex items-center gap-4 bg-slate-900 dark:bg-slate-800 text-white px-6 py-3.5 rounded-2xl shadow-2xl border border-slate-700">
-                        <GitCompare className="w-4 h-4 text-brand-400 shrink-0" />
-                        <span className="text-sm font-semibold">{compareIds.length} candidates selected</span>
+            {/* Floating Bulk Action Tray — appears when 1+ candidates are selected */}
+            {compareIds.length >= 1 && !showCompareModal && (
+                <div className="fixed bottom-[calc(var(--mobile-nav-height)+var(--safe-bottom)+16px)] md:bottom-6 left-1/2 -translate-x-1/2 z-[55] animate-in slide-in-from-bottom-4 fade-in duration-300 w-fit max-w-[95%]">
+                    <div className="flex items-center gap-3 bg-slate-900 dark:bg-slate-800 text-white px-4 sm:px-6 py-3 rounded-2xl shadow-2xl border border-slate-700 overflow-x-auto no-scrollbar">
+                        <span className="text-sm font-semibold shrink-0 whitespace-nowrap">{compareIds.length} selected</span>
+                        {compareIds.length >= 2 && compareIds.length <= 3 && (
+                            <button
+                                onClick={() => setShowCompareModal(true)}
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold rounded-lg transition-colors shrink-0"
+                            >
+                                <GitCompare className="w-3.5 h-3.5" /> Compare
+                            </button>
+                        )}
                         <button
-                            onClick={() => setShowCompareModal(true)}
-                            className="flex items-center gap-1.5 px-4 py-1.5 bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold rounded-xl transition-colors"
+                            onClick={() => {
+                                if (window.confirm(`Reject ${compareIds.length} candidate${compareIds.length > 1 ? 's' : ''}?`)) {
+                                    compareIds.forEach(id => {
+                                        if (onDeclineCandidate) onDeclineCandidate(project.id, id);
+                                    });
+                                    setCompareIds([]);
+                                }
+                            }}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 text-xs font-bold rounded-lg transition-colors shrink-0 border border-red-500/30"
                         >
-                            Compare Side-by-Side <ChevronRight className="w-3.5 h-3.5" />
+                            Reject
                         </button>
                         <button
                             onClick={() => setCompareIds([])}
-                            className="p-1.5 hover:bg-slate-700 rounded-lg transition-colors text-slate-400 hover:text-white"
+                            className="p-1.5 hover:bg-slate-700 rounded-lg transition-colors text-slate-400 hover:text-white shrink-0 sm:ml-2"
                         >
-                            <X className="w-3.5 h-3.5" />
+                            <X className="w-4 h-4" />
                         </button>
                     </div>
                 </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Briefcase, Mail, Lock, AlertCircle, GraduationCap } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -23,12 +24,14 @@ const Login = () => {
         e.preventDefault();
         setError('');
         setIsLoading(true);
+        const loginToast = toast.loading('Logging in...');
 
         try {
             if (email && password) {
                 await loginWithEmail(email, password, type || 'student');
 
                 setIsLoading(false);
+                toast.success('Logged in successfully', { id: loginToast });
                 if (type === 'recruiter') {
                     navigate('/dashboard/recruiter');
                 } else {
@@ -37,11 +40,17 @@ const Login = () => {
             } else {
                 setError('Please enter both email and password.');
                 setIsLoading(false);
+                toast.dismiss(loginToast);
             }
         } catch (err: any) {
             console.error('Login Error:', err);
-            setError(err.message || 'Invalid email or password.');
+            let errorMessage = err.message || 'Invalid email or password.';
+            if (errorMessage.toLowerCase().includes('invalid login credentials')) {
+                errorMessage = "We couldn't find an account with that email/password. Need to reset it?";
+            }
+            setError(errorMessage);
             setIsLoading(false);
+            toast.error(errorMessage, { id: loginToast });
         }
     };
 
@@ -86,7 +95,7 @@ const Login = () => {
                 </div>
 
                 <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-md relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
-                    <div className="glass-card py-10 px-6 sm:px-10">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl py-10 px-6 sm:px-10">
                         <div className="space-y-5">
                             <Link to="/login?type=student" className="relative block w-full">
                                 <div className="relative flex items-center p-5 border border-slate-200 dark:border-slate-800 hover:border-brand-500 rounded-xl transition-all bg-white dark:bg-slate-900">
@@ -155,7 +164,7 @@ const Login = () => {
                 </p>
             </div>
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="glass-card py-10 px-6 sm:px-10 relative overflow-hidden">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl py-10 px-6 sm:px-10 relative overflow-hidden">
 
                     {/* No decorative blobs */}
 
