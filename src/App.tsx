@@ -17,6 +17,7 @@ import ResetPassword from './pages/ResetPassword';
 import CompanyProfile from './pages/CompanyProfile';
 import NotFound from './pages/NotFound';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AIProvider } from './contexts/AIContext';
 import { Navigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import ScrollToTop from './components/ScrollToTop';
@@ -96,6 +97,7 @@ function App() {
 
   return (
     <AuthProvider>
+      <AIProvider>
       <Router>
         <ScrollToTop />
         <MainLayout>
@@ -131,6 +133,7 @@ function App() {
           },
         }} />
       </Router>
+      </AIProvider>
     </AuthProvider>
   );
 }

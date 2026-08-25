@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { X, FileText, User, Github, Linkedin, GraduationCap, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
+import { X, FileText, User, Github, Linkedin, GraduationCap, ChevronLeft, ChevronRight, AlertTriangle, SquareTerminal } from 'lucide-react';
 import type { StudentProfile } from './StudentProfileCard';
+import { useAIContext } from '../../contexts/AIContext';
 
 interface ApplicantReviewViewProps {
     candidate: StudentProfile;
@@ -16,6 +17,7 @@ interface ApplicantReviewViewProps {
 
 const ApplicantReviewView = ({ candidate, onClose, onAccept, onDecline, isArchived: _isArchived = false, onRevert: _onRevert, onUpdateStage, onNext, onPrev }: ApplicantReviewViewProps) => {
     const [showDeclineConfirm, setShowDeclineConfirm] = useState(false);
+    const { openAssistant } = useAIContext();
 
     return (
         <div className="fixed inset-0 z-[100] flex items-end md:items-stretch md:justify-end bg-slate-900/40 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none" onClick={onClose}>
@@ -121,7 +123,15 @@ const ApplicantReviewView = ({ candidate, onClose, onAccept, onDecline, isArchiv
                     {/* Application Info / Cover Letter */}
                     <div className="w-full border-t border-slate-200 dark:border-slate-800 pt-8 flex flex-col justify-between">
                         <div>
-                            <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-3">Cover Letter</h4>
+                            <div className="flex items-center justify-between mb-3">
+                                <h4 className="text-lg font-bold text-slate-900 dark:text-white">Cover Letter</h4>
+                                <button
+                                    onClick={() => openAssistant({ entity: 'candidate_review', data: { candidateName: candidate.name, candidateId: candidate.id } })}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 hover:bg-brand-100 dark:bg-brand-900/20 dark:hover:bg-brand-900/40 text-brand-600 dark:text-brand-400 text-xs font-bold rounded-lg transition-colors border border-brand-200 dark:border-brand-800"
+                                >
+                                    <SquareTerminal className="w-3.5 h-3.5" /> AI Review
+                                </button>
+                            </div>
                             <div className="prose-reading bg-white dark:bg-slate-800/80 p-5 rounded-xl border border-slate-200 dark:border-slate-700/80 max-w-none shadow-sm whitespace-pre-line mb-6 text-slate-700 dark:text-slate-300">
                                 {(candidate as any).coverLetter
                                     ? (candidate as any).coverLetter

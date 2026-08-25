@@ -8,6 +8,7 @@ import { useNotifications } from '../hooks/useNotifications';
 import NotificationCenter from './NotificationCenter';
 import AssistantModal from './ai/AssistantModal';
 import { useKeyboardShortcut } from '../hooks/useKeyboardShortcut';
+import { useAIContext } from '../contexts/AIContext';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -17,11 +18,12 @@ const Navbar = () => {
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [showStatusMenu, setShowStatusMenu] = useState(false);
     const [showNotificationCenter, setShowNotificationCenter] = useState(false);
-    const [isAssistantOpen, setIsAssistantOpen] = useState(false);
+    
+    const { isAssistantOpen, openAssistant, closeAssistant } = useAIContext();
     const { unreadCount } = useNotifications();
     
     useKeyboardShortcut('k', () => {
-        if (isAuthenticated) setIsAssistantOpen(true);
+        if (isAuthenticated) openAssistant();
     }, { ctrl: true, preventDefault: true });
     const [_, setTick] = useState(0);
 
@@ -214,10 +216,10 @@ const Navbar = () => {
                                 <div className="flex items-center gap-1 md:gap-3 mr-2">
                                     {/* AI Assistant CMD+K Trigger */}
                                     <button
-                                        onClick={() => setIsAssistantOpen(true)}
-                                        className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700/80 rounded-xl border border-slate-200 dark:border-slate-700/80 text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors shadow-sm"
+                                        onClick={() => openAssistant()}
+                                        className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-slate-100/50 hover:bg-slate-100 dark:bg-slate-800/50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg text-sm font-medium transition-colors border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 group"
                                     >
-                                        <SquareTerminal className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                                        <SquareTerminal className="w-4 h-4 text-brand-600 dark:text-brand-400 group-hover:scale-110 transition-transform" />
                                         <span className="text-xs font-bold mr-1">Ask ProjectMatch</span>
                                         <kbd className="hidden lg:inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded text-slate-500 dark:text-slate-400">
                                             <span className="text-[11px]">⌘</span>K
@@ -226,7 +228,7 @@ const Navbar = () => {
 
                                     {/* Mobile AI Trigger */}
                                     <button
-                                        onClick={() => setIsAssistantOpen(true)}
+                                        onClick={() => openAssistant()}
                                         className="md:hidden relative p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/80 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
                                         aria-label="Ask ProjectMatch"
                                     >
@@ -441,7 +443,7 @@ const Navbar = () => {
             {/* AI Assistant Modal */}
             <AssistantModal 
                 isOpen={isAssistantOpen} 
-                onClose={() => setIsAssistantOpen(false)} 
+                onClose={closeAssistant} 
             />
         </nav>
     );

@@ -4,6 +4,7 @@ import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 import { askProjectMatch } from '../../services/ai';
 import type { AIResponse } from '../../services/ai';
 import StructuredResponses from './StructuredResponses';
+import { useAIContext } from '../../contexts/AIContext';
 
 interface AssistantModalProps {
     isOpen: boolean;
@@ -19,23 +20,8 @@ interface Message {
 }
 
 export default function AssistantModal({ isOpen, onClose }: AssistantModalProps) {
-    const [messages, setMessages] = useState<Message[]>([
-        {
-            id: '1',
-            role: 'assistant',
-            content: (
-                <div className="space-y-3 mt-1">
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">What do you want to figure out?</h3>
-                    <p className="text-slate-600 dark:text-slate-400">Find opportunities, evaluate candidates, or get help with your next decision.</p>
-                    <div className="flex flex-wrap gap-2 pt-3">
-                        <button className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md text-sm font-medium transition-colors border border-slate-200 dark:border-slate-700 flex items-center gap-2">Find the right project</button>
-                        <button className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md text-sm font-medium transition-colors border border-slate-200 dark:border-slate-700 flex items-center gap-2">Prioritize candidates</button>
-                        <button className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md text-sm font-medium transition-colors border border-slate-200 dark:border-slate-700 flex items-center gap-2">Explain a match</button>
-                    </div>
-                </div>
-            )
-        }
-    ]);
+    const { currentAIContext } = useAIContext();
+    const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
     const [isThinking, setIsThinking] = useState(false);
     const [loadingStage, setLoadingStage] = useState('');
@@ -45,12 +31,55 @@ export default function AssistantModal({ isOpen, onClose }: AssistantModalProps)
 
     useKeyboardShortcut('Escape', onClose, { enabled: isOpen });
 
-    // Focus input when modal opens
+    // Focus input when modal opens and set contextual initial message
     useEffect(() => {
         if (isOpen) {
             setTimeout(() => inputRef.current?.focus(), 100);
+            
+            // Generate contextual welcome message
+            let title = "What do you want to figure out?";
+            let subtitle = "Find opportunities, evaluate candidates, or get help with your next decision.";
+            let chips = ["Find the right project", "Prioritize candidates", "Explain a match"];
+            
+            if (currentAIContext.entity === 'project_dashboard') {
+                title = `Analyzing ${currentAIContext.data?.projectName || 'Project'}`;
+                subtitle = "Ask me to summarize the applicant pool or find skill gaps.";
+                chips = ["Summarize top applicants", "Identify skill gaps", "Compare fit"];
+            } else if (currentAIContext.entity === 'candidate_review') {
+                title = `Reviewing ${currentAIContext.data?.candidateName || 'Candidate'}`;
+                subtitle = "I can compare their skills against your project requirements.";
+                chips = ["Compare against requirements", "Draft rejection letter", "Draft interview invite"];
+            } else if (currentAIContext.entity === 'student_application') {
+                title = `Applying to ${currentAIContext.data?.projectName || 'Project'}`;
+                subtitle = "Need help highlighting your strengths?";
+                chips = ["Draft cover letter bullets", "Am I a good fit?"];
+            }
+
+            setMessages([
+                {
+                    id: '1',
+                    role: 'assistant',
+                    content: (
+                        <div className="space-y-3 mt-1">
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white">{title}</h3>
+                            <p className="text-slate-600 dark:text-slate-400">{subtitle}</p>
+                            <div className="flex flex-wrap gap-2 pt-3">
+                                {chips.map((chip, idx) => (
+                                    <button 
+                                        key={idx}
+                                        onClick={() => setInput(chip)}
+                                        className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md text-sm font-medium transition-colors border border-slate-200 dark:border-slate-700 flex items-center gap-2"
+                                    >
+                                        {chip}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )
+                }
+            ]);
         }
-    }, [isOpen]);
+    }, [isOpen, currentAIContext]);
 
     // Auto-scroll to bottom
     useEffect(() => {
@@ -85,10 +114,14 @@ export default function AssistantModal({ isOpen, onClose }: AssistantModalProps)
         }, 800);
 
         try {
-            // Get page context (mocked for now, normally derived from location or selected items)
-            const context = { current_url: window.location.pathname };
+            // Pass the active context directly to the AI service
+            const contextPayload = { 
+                current_url: window.location.pathname,
+                active_entity: currentAIContext.entity,
+                entity_data: currentAIContext.data
+            };
             
-            const aiData = await askProjectMatch(userMsg, context);
+            const aiData = await askProjectMatch(userMsg, contextPayload);
             
             // Replace loading state with real response
             setMessages(prev => prev.map(m => m.id === loadingId ? {

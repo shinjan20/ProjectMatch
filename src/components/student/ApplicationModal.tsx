@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Send, Link as LinkIcon, AlertCircle, Sparkles } from 'lucide-react';
+import { X, Send, Link as LinkIcon, AlertCircle, Sparkles, SquareTerminal } from 'lucide-react';
 import { MOCK_PROJECTS } from '../../constants';
 import { checkFormForProfanityAsync } from '../../utils/profanityFilter';
 import ProfanityWarningModal from '../ProfanityWarningModal';
@@ -8,6 +8,7 @@ import { supabase } from '../../lib/supabase';
 import toast from 'react-hot-toast';
 import { calculateMatchScore } from '../../utils/aiMatch';
 import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
+import { useAIContext } from '../../contexts/AIContext';
 
 interface ApplicationModalProps {
     isOpen: boolean;
@@ -26,6 +27,7 @@ interface ApplicationModalProps {
 }
 
 export default function ApplicationModal({ isOpen, onClose, projectId, project: passedProject, onSubmitSuccess }: ApplicationModalProps) {
+    const { openAssistant } = useAIContext();
     if (!isOpen) return null;
 
     const { userId } = useAuth();
@@ -212,9 +214,18 @@ export default function ApplicationModal({ isOpen, onClose, projectId, project: 
                         )}
 
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
-                                Why should we hire you? <span className="text-red-500">*</span>
-                            </label>
+                            <div className="flex items-center justify-between mb-2">
+                                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">
+                                    Why should we hire you? <span className="text-red-500">*</span>
+                                </label>
+                                <button
+                                    type="button"
+                                    onClick={() => openAssistant({ entity: 'student_application', data: { projectName: project.title, projectId: project.id } })}
+                                    className="flex items-center gap-1.5 px-2 py-1 bg-brand-50 hover:bg-brand-100 dark:bg-brand-900/20 dark:hover:bg-brand-900/40 text-brand-600 dark:text-brand-400 text-[10px] uppercase tracking-wider font-bold rounded transition-colors border border-brand-200 dark:border-brand-800"
+                                >
+                                    <SquareTerminal className="w-3 h-3" /> Draft with AI
+                                </button>
+                            </div>
                             <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
                                 Highlight your matching skills ({project.tags?.join(', ') || 'required skills'}) and any related past projects.
                             </p>

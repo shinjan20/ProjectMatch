@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { X, Briefcase, MapPin, Clock, Users, FileText, Download, CheckSquare, Square, GitCompare } from 'lucide-react';
+import { X, Briefcase, MapPin, Clock, Users, FileText, Download, CheckSquare, Square, GitCompare, SquareTerminal } from 'lucide-react';
 import type { StudentProfile } from './StudentProfileCard';
 import ApplicantReviewView from './ApplicantReviewView';
 import WorkingCandidateView from './WorkingCandidateView';
 import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
+import { useAIContext } from '../../contexts/AIContext';
 
 interface ProjectDashboardProps {
     isOpen: boolean;
@@ -26,6 +27,7 @@ const ProjectDashboard = ({ isOpen, onClose, project, onArchive, onAcceptCandida
     const [reviewingWorkingCandidate, setReviewingWorkingCandidate] = useState<StudentProfile | null>(null);
     const [compareIds, setCompareIds] = useState<string[]>([]);
     const [showCompareModal, setShowCompareModal] = useState(false);
+    const { openAssistant } = useAIContext();
 
     const toggleCompare = (id: string) => {
         setCompareIds(prev =>
@@ -520,6 +522,15 @@ const ProjectDashboard = ({ isOpen, onClose, project, onArchive, onAcceptCandida
                                 <GitCompare className="w-3.5 h-3.5" /> Compare
                             </button>
                         )}
+                        <button
+                            onClick={() => openAssistant({ 
+                                entity: 'project_dashboard', 
+                                data: { projectName: project?.role, selectedIds: compareIds } 
+                            })}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-500/10 hover:bg-brand-500/20 text-brand-400 text-xs font-bold rounded-lg transition-colors shrink-0 border border-brand-500/20"
+                        >
+                            <SquareTerminal className="w-3.5 h-3.5" /> Ask AI
+                        </button>
                         <button
                             onClick={() => {
                                 if (window.confirm(`Reject ${compareIds.length} candidate${compareIds.length > 1 ? 's' : ''}?`)) {
