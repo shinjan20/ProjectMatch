@@ -61,9 +61,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setHasCompletedProfile(storedCompleted);
         }
 
+        // Safety fallback: If auth state doesn't resolve in 3 seconds, unblock UI
+        const authTimeout = setTimeout(() => {
+            setIsAuthLoading(false);
+        }, 3000);
+
+        // Check for current session manually as a fallback for some Supabase client versions
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (!session) setIsAuthLoading(false);
+        });
+
         // Listen for Supabase Auth state changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-            if (event === 'SIGNED_IN' && session) {
+            if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
                 const user = session.user;
                 const metadata = user.user_metadata;
 
@@ -136,12 +146,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setHasCompletedProfile(false);
                 setIsAuthLoading(false); // auth resolved
             } else {
-                // Any other event (TOKEN_REFRESHED, USER_UPDATED, INITIAL_SESSION)
+                // Any other event (TOKEN_REFRESHED, USER_UPDATED)
                 setIsAuthLoading(false);
             }
         });
 
         return () => {
+            clearTimeout(authTimeout);
             subscription.unsubscribe();
         };
     }, []);
