@@ -162,7 +162,7 @@ export default function AssistantModal({ isOpen, onClose }: AssistantModalProps)
                 <div className="px-5 py-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900 shrink-0">
                     <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
                         <h2 className="text-sm font-semibold tracking-wide">
-                            <span className="text-brand-600 dark:text-brand-500 mr-2">→</span>Ask ProjectMatch
+                            <span className="text-brand-600 dark:text-brand-500 mr-2">→</span>Ask Atlas
                         </h2>
                     </div>
                     <button
@@ -202,7 +202,7 @@ export default function AssistantModal({ isOpen, onClose }: AssistantModalProps)
                                 <div key={msg.id} className="w-full">
                                     {!isFirstMessage && (
                                         <div className="flex items-center gap-2 mb-3 mt-4">
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">PROJECTMATCH FOUND</p>
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">ATLAS FOUND</p>
                                             <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800/50"></div>
                                         </div>
                                     )}
