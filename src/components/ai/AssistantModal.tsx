@@ -67,7 +67,7 @@ export default function AssistantModal({ isOpen, onClose }: AssistantModalProps)
                                 {chips.map((chip, idx) => (
                                     <button 
                                         key={idx}
-                                        onClick={() => setInput(chip)}
+                                        onClick={() => submitMessage(chip)}
                                         className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md text-sm font-medium transition-colors border border-slate-200 dark:border-slate-700 flex items-center gap-2"
                                     >
                                         {chip}
@@ -88,11 +88,10 @@ export default function AssistantModal({ isOpen, onClose }: AssistantModalProps)
 
     if (!isOpen) return null;
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!input.trim() || isThinking) return;
+    const submitMessage = async (msgToSubmit: string) => {
+        if (!msgToSubmit.trim() || isThinking) return;
 
-        const userMsg = input.trim();
+        const userMsg = msgToSubmit.trim();
         setInput('');
         
         // Add user message
@@ -143,18 +142,21 @@ export default function AssistantModal({ isOpen, onClose }: AssistantModalProps)
         }
     };
 
-    const isWorkspaceActive = messages.length > 1;
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        submitMessage(input);
+    };
 
     return (
-        <div className={`fixed inset-0 z-[100] flex sm:flex-col items-center justify-end sm:justify-start sm:p-6 bg-transparent transition-all duration-300 ease-out ${isWorkspaceActive ? 'sm:pt-[10vh]' : 'sm:pt-[38vh]'}`}>
-            {/* Backdrop - Solid, no glassmorphism */}
+        <div className={`fixed inset-0 z-[100] flex sm:flex-col items-center justify-end sm:justify-start sm:p-6 bg-transparent transition-all duration-300 ease-out sm:pt-[15vh]`}>
+            {/* Backdrop - Glassmorphism */}
             <div
-                className="absolute inset-0 bg-slate-900/40 transition-opacity animate-in fade-in duration-300"
+                className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm transition-opacity animate-in fade-in duration-300"
                 onClick={onClose}
             />
 
-            {/* Modal Box - Solid surfaces, crisp borders */}
-            <div className={`relative w-full sm:max-w-3xl bg-white dark:bg-[#0a0f1c] sm:rounded-xl rounded-t-2xl shadow-2xl shadow-slate-900/20 border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all duration-300 ease-out flex flex-col font-sans animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-0 sm:zoom-in-95 ${isWorkspaceActive ? 'h-auto max-h-[95dvh] sm:max-h-[80vh]' : 'h-auto'}`}>
+            {/* Modal Box - Premium glass surfaces */}
+            <div className={`relative w-full sm:max-w-3xl bg-white/95 dark:bg-[#0a0f1c]/95 backdrop-blur-xl sm:rounded-xl rounded-t-2xl shadow-2xl shadow-slate-900/20 border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all duration-300 ease-out flex flex-col font-sans animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-0 sm:zoom-in-95 h-auto max-h-[95dvh] sm:max-h-[70vh]`}>
                 
                 {/* Header */}
                 <div className="px-5 py-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900 shrink-0">
@@ -172,11 +174,11 @@ export default function AssistantModal({ isOpen, onClose }: AssistantModalProps)
                 </div>
 
                 {/* Persistent Context Bar */}
-                <div className="px-5 py-3 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0a0f1c] shrink-0">
+                <div className="px-5 py-3 border-b border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-[#0a0f1c]/50 shrink-0">
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Context</p>
                     <div className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/50 w-fit px-3 py-1.5 rounded-md border border-slate-200 dark:border-slate-700">
                         <Search className="w-3.5 h-3.5 text-slate-500" />
-                        <span>Global Search</span>
+                        <span className="capitalize">{currentAIContext.entity.replace('_', ' ')}</span>
                     </div>
                 </div>
 
@@ -224,7 +226,7 @@ export default function AssistantModal({ isOpen, onClose }: AssistantModalProps)
                 </div>
 
                 {/* Input Area */}
-                <div className="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shrink-0">
+                <div className="p-4 bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 shrink-0">
                     <form onSubmit={handleSubmit} className="relative flex flex-col gap-2 max-w-4xl mx-auto">
                         <div className="relative flex-1 bg-white dark:bg-[#0a0f1c] border border-slate-300 dark:border-slate-700 focus-within:border-brand-500 focus-within:ring-1 focus-within:ring-brand-500 rounded-lg overflow-hidden transition-all shadow-sm">
                             <input
@@ -239,21 +241,11 @@ export default function AssistantModal({ isOpen, onClose }: AssistantModalProps)
                             <button
                                 type="submit"
                                 disabled={!input.trim() || isThinking}
-                                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 disabled:opacity-50 text-slate-600 dark:text-slate-300 rounded-md transition-colors"
+                                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 bg-brand-500 hover:bg-brand-600 disabled:bg-slate-200 dark:disabled:bg-slate-800 disabled:opacity-50 text-white dark:disabled:text-slate-500 rounded-md transition-colors shadow-sm"
                                 title="Send"
                             >
                                 <CornerDownLeft className="w-4 h-4" />
                             </button>
-                        </div>
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between px-1 gap-2 sm:gap-0 mt-3">
-                            <div className="flex flex-wrap gap-x-4 gap-y-2">
-                                <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer transition-colors">
-                                    Find product management opportunities
-                                </span>
-                                <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer transition-colors">
-                                    Compare candidates
-                                </span>
-                            </div>
                         </div>
                     </form>
                 </div>
