@@ -6,6 +6,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   /* Typeface roles: do not mix these arbitrarily at component level */
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;       /* DEFAULT: all body, tables, forms, messages */
@@ -70,10 +72,8 @@
     text-rendering: optimizeLegibility;
   }
 
-  @media (prefers-color-scheme: dark) {
-    body {
-      @apply bg-[#0b0f19] text-slate-50;
-    }
+  .dark body {
+    @apply bg-[#0b0f19] text-slate-50;
   }
 
   /* ============================================================
@@ -140,10 +140,8 @@
     color: theme(colors.slate.800);
   }
 
-  @media (prefers-color-scheme: dark) {
-    .reading-mode {
-      color: theme(colors.slate.200);
-    }
+  .dark .reading-mode {
+    color: theme(colors.slate.200);
   }
 
   /* Reading mode within dark-classed containers */
@@ -207,9 +205,7 @@
     border: 1px solid rgba(0, 0, 0, 0.08);
   }
 
-  @media (prefers-color-scheme: dark) {
-    .glass { border: 1px solid rgba(255, 255, 255, 0.08); }
-  }
+  .dark .glass { border: 1px solid rgba(255, 255, 255, 0.08); }
 
   .glass-card {
     @apply bg-white dark:bg-[#111827] rounded-xl transition-all duration-300 relative overflow-hidden;
@@ -217,9 +213,7 @@
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
   }
 
-  @media (prefers-color-scheme: dark) {
-    .glass-card { border: 1px solid rgba(255, 255, 255, 0.06); }
-  }
+  .dark .glass-card { border: 1px solid rgba(255, 255, 255, 0.06); }
 
   .glass-card:hover {
     @apply border-slate-300 dark:border-slate-700 shadow-md;
@@ -260,8 +254,6 @@
   position: relative;
   border: solid 1px rgba(0, 0, 0, 0.08);
 }
-@media (prefers-color-scheme: dark) {
-  .animated-border-badge {
-    border: solid 1px rgba(255, 255, 255, 0.08);
-  }
+.dark .animated-border-badge {
+  border: solid 1px rgba(255, 255, 255, 0.08);
 }
