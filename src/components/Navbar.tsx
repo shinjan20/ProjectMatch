@@ -332,6 +332,21 @@ const Navbar = () => {
                                 </div>
                             ) : (
                                 <div className="flex items-center gap-2 lg:gap-4">
+                                    {/* Theme Toggle for Unauthenticated */}
+                                    <button
+                                        onClick={() => {
+                                            if (theme === 'light') setTheme('dark');
+                                            else if (theme === 'dark') setTheme('auto');
+                                            else setTheme('light');
+                                        }}
+                                        className="relative p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-850/50 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
+                                        aria-label="Toggle theme"
+                                        title={`Theme: ${theme}`}
+                                    >
+                                        {theme === 'light' && <Sun className="w-5 h-5" />}
+                                        {theme === 'dark' && <Moon className="w-5 h-5" />}
+                                        {theme === 'auto' && <Monitor className="w-5 h-5" />}
+                                    </button>
                                     <Link to="/login" className="text-white bg-brand-600 hover:bg-brand-700 font-medium px-5 py-2.5 rounded-xl flex items-center gap-2 shadow-md shadow-brand-500/20 hover:shadow-lg hover:-translate-y-0.5 transition-all btn-interactive">
                                         Sign In
                                     </Link>
