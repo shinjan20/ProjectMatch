@@ -1,6 +1,6 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { Menu, X, LogOut, User as UserIcon, Settings as SettingsIcon, MoreHorizontal, Check, XCircle, CheckCircle2, Bell, SquareTerminal } from 'lucide-react';
+import { Menu, X, LogOut, User as UserIcon, Settings as SettingsIcon, MoreHorizontal, Check, XCircle, CheckCircle2, Bell, SquareTerminal, Sun, Moon, Monitor } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useInterviewStatus } from '../hooks/useInterviewStatus';
@@ -9,6 +9,7 @@ import NotificationCenter from './NotificationCenter';
 import AssistantModal from './ai/AssistantModal';
 import { useKeyboardShortcut } from '../hooks/useKeyboardShortcut';
 import { useAIContext } from '../contexts/AIContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -20,6 +21,7 @@ const Navbar = () => {
     const [showNotificationCenter, setShowNotificationCenter] = useState(false);
     
     const { isAssistantOpen, openAssistant, closeAssistant } = useAIContext();
+    const { theme, setTheme } = useTheme();
     const { unreadCount } = useNotifications();
     
     useKeyboardShortcut('k', () => {
@@ -233,6 +235,22 @@ const Navbar = () => {
                                         aria-label="Ask Atlas"
                                     >
                                         <SquareTerminal className="w-5 h-5" />
+                                    </button>
+
+                                    {/* Theme Toggle */}
+                                    <button
+                                        onClick={() => {
+                                            if (theme === 'light') setTheme('dark');
+                                            else if (theme === 'dark') setTheme('auto');
+                                            else setTheme('light');
+                                        }}
+                                        className="relative p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-850/50 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors mr-1"
+                                        aria-label="Toggle theme"
+                                        title={`Theme: ${theme}`}
+                                    >
+                                        {theme === 'light' && <Sun className="w-5 h-5" />}
+                                        {theme === 'dark' && <Moon className="w-5 h-5" />}
+                                        {theme === 'auto' && <Monitor className="w-5 h-5" />}
                                     </button>
 
                                     <div className="relative">

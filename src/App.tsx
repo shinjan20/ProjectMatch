@@ -18,6 +18,7 @@ import CompanyProfile from './pages/CompanyProfile';
 import NotFound from './pages/NotFound';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AIProvider } from './contexts/AIContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { Navigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import ScrollToTop from './components/ScrollToTop';
@@ -97,43 +98,45 @@ function App() {
 
   return (
     <AuthProvider>
-      <AIProvider>
-      <Router>
-        <ScrollToTop />
-        <MainLayout>
-          <ErrorBoundary>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/projects" element={<Projects />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/auth/v1/update-password" element={<ResetPassword />} />
-              <Route path="/auth/v1/callback" element={<AuthCallback />} />
-              <Route path="/student-profile-setup" element={<StudentProfileForm />} />
-              <Route path="/dashboard/student" element={<ProtectedStudentRoute><StudentDashboard /></ProtectedStudentRoute>} />
-              <Route path="/completed-projects" element={<ProtectedStudentRoute><CompletedProjects /></ProtectedStudentRoute>} />
-              <Route path="/dashboard/recruiter" element={<ProtectedRoute><RecruiterDashboard /></ProtectedRoute>} />
-              <Route path="/company/:companyId" element={<ProtectedRoute><CompanyProfile /></ProtectedRoute>} />
-              <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+      <ThemeProvider>
+        <AIProvider>
+          <Router>
+            <ScrollToTop />
+            <MainLayout>
+              <ErrorBoundary>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/projects" element={<Projects />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/auth/v1/update-password" element={<ResetPassword />} />
+                  <Route path="/auth/v1/callback" element={<AuthCallback />} />
+                  <Route path="/student-profile-setup" element={<StudentProfileForm />} />
+                  <Route path="/dashboard/student" element={<ProtectedStudentRoute><StudentDashboard /></ProtectedStudentRoute>} />
+                  <Route path="/completed-projects" element={<ProtectedStudentRoute><CompletedProjects /></ProtectedStudentRoute>} />
+                  <Route path="/dashboard/recruiter" element={<ProtectedRoute><RecruiterDashboard /></ProtectedRoute>} />
+                  <Route path="/company/:companyId" element={<ProtectedRoute><CompanyProfile /></ProtectedRoute>} />
+                  <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
 
-              {/* Catch-all route — proper 404 page */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </ErrorBoundary>
-        </MainLayout>
-        <Toaster position="bottom-right" toastOptions={{
-          className: 'dark:bg-slate-900 dark:text-white',
-          style: {
-            borderRadius: '12px',
-            background: '#ffffff',
-            color: '#0f172a',
-            border: '1px solid rgba(226, 232, 240, 0.4)',
-          },
-        }} />
-      </Router>
-      </AIProvider>
+                  {/* Catch-all route — proper 404 page */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </ErrorBoundary>
+            </MainLayout>
+            <Toaster position="bottom-right" toastOptions={{
+              className: 'dark:bg-slate-900 dark:text-white',
+              style: {
+                borderRadius: '12px',
+                background: '#ffffff',
+                color: '#0f172a',
+                border: '1px solid rgba(226, 232, 240, 0.4)',
+              },
+            }} />
+          </Router>
+        </AIProvider>
+      </ThemeProvider>
     </AuthProvider>
   );
 }

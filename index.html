@@ -6,6 +6,29 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ProjectMatch | Build Experience with Live Projects</title>
+  <script>
+    (function () {
+      try {
+        var theme = localStorage.getItem('projectmatch-theme') || 'auto';
+        var resolved = theme;
+        if (theme === 'auto') {
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+          if (prefersDark) {
+            resolved = 'dark';
+          } else if (prefersLight) {
+            resolved = 'light';
+          } else {
+            var hour = new Date().getHours();
+            resolved = (hour >= 6 && hour < 19) ? 'light' : 'dark';
+          }
+        }
+        if (resolved === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+      } catch (e) { }
+    })();
+  </script>
   <meta name="description"
     content="Connect with top companies and work on live engineering and management projects. Build real-world experience and stand out to recruiters." />
   <meta name="keywords"
