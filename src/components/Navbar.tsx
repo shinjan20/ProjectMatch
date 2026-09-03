@@ -22,7 +22,7 @@ const Navbar = () => {
     const { unreadCount } = useNotifications();
     
     useKeyboardShortcut('k', () => {
-        if (isAuthenticated) openAssistant();
+        openAssistant();
     }, { ctrl: true, preventDefault: true });
     const [_, setTick] = useState(0);
 
@@ -187,28 +187,31 @@ const Navbar = () => {
                                     )}
                                 </div>
                             )}
+                            <div className="flex items-center gap-1 md:gap-3 mr-2">
+                                {/* AI Assistant CMD+K Trigger */}
+                                <button
+                                    onClick={() => openAssistant()}
+                                    className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-slate-100/50 hover:bg-slate-100 dark:bg-slate-800/50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 group"
+                                >
+                                    <SquareTerminal className="w-4 h-4 text-brand-600 dark:text-brand-400 group-hover:scale-110 transition-transform" />
+                                    <span className="text-xs font-bold mr-1">Ask Atlas</span>
+                                    <kbd className="hidden lg:inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded text-slate-500 dark:text-slate-400">
+                                        <span className="text-[11px]">⌘</span>K
+                                    </kbd>
+                                </button>
+
+                                {/* Mobile AI Trigger */}
+                                <button
+                                    onClick={() => openAssistant()}
+                                    className="md:hidden relative p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/80 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
+                                    aria-label="Ask Atlas"
+                                >
+                                    <SquareTerminal className="w-5 h-5" />
+                                </button>
+                            </div>
+
                             {isAuthenticated && (
                                 <div className="flex items-center gap-1 md:gap-3 mr-2">
-                                    {/* AI Assistant CMD+K Trigger */}
-                                    <button
-                                        onClick={() => openAssistant()}
-                                        className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-slate-100/50 hover:bg-slate-100 dark:bg-slate-800/50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg text-sm font-medium transition-colors border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 group"
-                                    >
-                                        <SquareTerminal className="w-4 h-4 text-brand-600 dark:text-brand-400 group-hover:scale-110 transition-transform" />
-                                        <span className="text-xs font-bold mr-1">Ask Atlas</span>
-                                        <kbd className="hidden lg:inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded text-slate-500 dark:text-slate-400">
-                                            <span className="text-[11px]">⌘</span>K
-                                        </kbd>
-                                    </button>
-
-                                    {/* Mobile AI Trigger */}
-                                    <button
-                                        onClick={() => openAssistant()}
-                                        className="md:hidden relative p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/80 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
-                                        aria-label="Ask Atlas"
-                                    >
-                                        <SquareTerminal className="w-5 h-5" />
-                                    </button>
 
                                     {/* Theme Toggle */}
                                     <button
