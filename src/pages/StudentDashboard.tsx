@@ -2,10 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { Briefcase, CheckCircle2, Archive, Clock, Home, Banknote, Calendar, Tag, X, CalendarCheck, MessageSquare, Download, XCircle, TrendingUp } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import StudentMessagingHub from '../components/student/StudentMessagingHub';
 import toast from 'react-hot-toast';
 import PageSkeleton from '../components/common/PageSkeleton';
+import EmptyState from '../components/ui/EmptyState';
 
 const timeAgo = (dateInput?: string) => {
     if (!dateInput) return 'Recently';
@@ -44,10 +45,21 @@ const studentFriendlyStatus = (rawStatus: string): { label: string; color: strin
     }
 };
 
+const VALID_TABS = ['applied', 'interviews', 'ongoing', 'messages', 'archived', 'analytics'] as const;
+type StudentTab = typeof VALID_TABS[number];
+
 export default function StudentDashboard() {
     const { userName, userRole, userId } = useAuth();
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState<'applied' | 'interviews' | 'ongoing' | 'messages' | 'archived' | 'analytics'>('applied');
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const tabParam = searchParams.get('tab') as StudentTab;
+    const activeTab: StudentTab = VALID_TABS.includes(tabParam) ? tabParam : 'applied';
+
+    const setActiveTab = useCallback((newTab: StudentTab) => {
+        setSearchParams({ tab: newTab });
+    }, [setSearchParams]);
+
     const [viewingApplicationId, setViewingApplicationId] = useState<string | null>(null);
     const [downloadingLetter, setDownloadingLetter] = useState<{ projectId: string, type: 'Offer Letter' | 'Completion Letter' } | null>(null);
 
@@ -74,7 +86,7 @@ export default function StudentDashboard() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [activeTab]);
 
-    // Sync hash with activeTab for mobile bottom navigation support
+    // Sync hash with activeTab for backward compatibility with older bookmarks
     useEffect(() => {
         const handleHashChange = () => {
             const hash = window.location.hash;
@@ -83,10 +95,12 @@ export default function StudentDashboard() {
             else if (hash === '#messages') setActiveTab('messages');
             else if (hash === '#analytics') setActiveTab('analytics');
         };
-        handleHashChange();
+        if (window.location.hash) {
+            handleHashChange();
+        }
         window.addEventListener('hashchange', handleHashChange);
         return () => window.removeEventListener('hashchange', handleHashChange);
-    }, []);
+    }, [setActiveTab]);
 
     useEffect(() => {
         let isMounted = true;
@@ -360,37 +374,24 @@ export default function StudentDashboard() {
 
     const renderProjectsList = (projects: any[], emptyMessage: string, iconType: 'archive' | 'rejected' | 'briefcase' = 'briefcase') => {
         if (projects.length === 0) {
-            return (
-                <div className="col-span-full relative overflow-hidden bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm rounded-[2rem] border border-slate-200/60 dark:border-slate-800 p-8 sm:p-12 text-center flex flex-col items-center justify-center animate-in fade-in slide-in-from-bottom-8 duration-500 shadow-xl shadow-brand-500/5">
-                    {/* Decorative blobs */}
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/5 rounded-full blur-3xl pointer-events-none -mr-32 -mt-32"></div>
-                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl pointer-events-none -ml-32 -mb-32"></div>
-                    
-                    <div className="bg-slate-100 dark:bg-slate-800/50 p-6 rounded-3xl mb-6 flex items-center justify-center relative z-10 border border-slate-200 dark:border-slate-700">
-                        {iconType === 'archive' && <Archive className="w-12 h-12 text-slate-400" />}
-                        {iconType === 'rejected' && <XCircle className="w-12 h-12 text-slate-400" />}
-                        {iconType === 'briefcase' && <Briefcase className="w-12 h-12 text-brand-500" />}
-                    </div>
-                    
-                    <h3 className="text-2xl font-bold font-heading text-slate-900 dark:text-white mb-3 relative z-10">
-                        {iconType === 'briefcase' && activeTab === 'applied' ? "Ready to start your journey?" : "Nothing to see here... yet"}
-                    </h3>
-                    
-                    <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto text-lg relative z-10">
-                        {iconType === 'briefcase' && activeTab === 'applied' 
-                            ? "You haven't applied to any live projects yet. There are hundreds of active opportunities waiting for you." 
-                            : emptyMessage}
-                    </p>
+            const Icon = iconType === 'archive' ? Archive : iconType === 'rejected' ? XCircle : Briefcase;
+            const title = iconType === 'briefcase' && activeTab === 'applied'
+                ? "No applications submitted yet"
+                : "No projects in this category";
+            const description = iconType === 'briefcase' && activeTab === 'applied'
+                ? "You haven't applied to any live projects yet. Browse active listings from top companies and submit your application."
+                : emptyMessage;
 
-                    {iconType === 'briefcase' && (
-                        <button
-                            onClick={() => navigate('/projects')}
-                            className="mt-8 px-8 py-4 bg-brand-600 hover:bg-brand-500 text-white font-bold rounded-2xl shadow-xl shadow-brand-500/20 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 relative z-10 btn-interactive text-lg"
-                        >
-                            <CalendarCheck className="w-5 h-5" />
-                            Discover Active Projects
-                        </button>
-                    )}
+            return (
+                <div className="col-span-full">
+                    <EmptyState
+                        icon={Icon}
+                        title={title}
+                        description={description}
+                        actionLabel={iconType === 'briefcase' ? "Browse Active Projects" : undefined}
+                        actionIcon={iconType === 'briefcase' ? CalendarCheck : undefined}
+                        onAction={iconType === 'briefcase' ? () => navigate('/projects') : undefined}
+                    />
                 </div>
             );
         }
@@ -663,99 +664,92 @@ export default function StudentDashboard() {
     };
 
     return (
-        <div className="relative min-h-screen pt-32 pb-20 bg-slate-50 dark:bg-[#030712] transition-colors duration-500">
-            {/* Background elements */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-                <div className="absolute top-[0%] left-[-10%] w-[40%] h-[40%] rounded-full bg-brand-500/10 dark:bg-brand-500/5 blur-[120px] mix-blend-multiply dark:mix-blend-screen"></div>
-                <div className="absolute top-[40%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-500/10 dark:bg-purple-500/5 blur-[120px] mix-blend-multiply dark:mix-blend-screen"></div>
-            </div>
-
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="relative min-h-screen pt-8 pb-20 bg-slate-50 dark:bg-[#0b0f19] transition-colors duration-200">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 
-                {/*  --- NEW: Welcome Analytics Card --- */}
-                <div className="mb-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-805 rounded-2xl p-8 shadow-sm">
-                    <div className="flex flex-col md:flex-row gap-8 items-start md:items-center justify-between">
+                {/* Welcome Analytics Card */}
+                <div className="mb-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-sm">
+                    <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
                         
                         <div className="flex-1">
-                            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-3">
+                            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold font-heading text-slate-900 dark:text-white mb-2">
                                 Welcome back, <span className="text-brand-600 dark:text-brand-400">{userName}</span>
                             </h1>
-                            <p className="text-slate-600 dark:text-slate-400 text-lg">
-                                Ready to take the next step in your career? Here is your current standing today.
+                            <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base">
+                                Track your live applications, scheduled interviews, active project contracts, and communications.
                             </p>
                         </div>
 
                         {/* Profile Completion Mini-Widget */}
-                        <div className="w-full md:w-72 bg-slate-50 dark:bg-slate-800/50 rounded-xl p-5 border border-slate-200 dark:border-slate-700">
+                        <div className="w-full md:w-72 bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
                             <div className="flex justify-between items-center mb-2">
-                                <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Profile Strength</span>
-                                <span className="text-sm font-bold text-brand-600 dark:text-brand-400">80%</span>
+                                <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Profile Strength</span>
+                                <span className="text-xs font-bold text-brand-600 dark:text-brand-400">80%</span>
                             </div>
-                            <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mb-3">
-                                <div className="h-full bg-brand-500 w-[80%] rounded-full"></div>
+                            <div className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mb-2">
+                                <div className="h-full bg-brand-600 dark:bg-brand-500 w-[80%] rounded-full"></div>
                             </div>
                             <p className="text-xs text-slate-500 dark:text-slate-400">
-                                You are <span className="font-semibold text-slate-750 dark:text-slate-200">20%</span> away from being an All-Star. Uploading a resume highly increases selection rates!
+                                Complete your profile skills to boost recruiter visibility by up to 40%.
                             </p>
                         </div>
                     </div>
 
                     {/* Stat Pills */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-8 border-t border-slate-200 dark:border-slate-800">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl bg-brand-50 dark:bg-brand-500/10 flex items-center justify-center text-brand-600 dark:text-brand-400">
-                                <Briefcase className="w-6 h-6" />
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-brand-50 dark:bg-brand-500/10 flex items-center justify-center text-brand-600 dark:text-brand-400">
+                                <Briefcase className="w-5 h-5" />
                             </div>
                             <div>
-                                <p className="text-2xl font-black text-slate-900 dark:text-white">{appliedProjects.length}</p>
-                                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Applications</p>
+                                <p className="text-xl font-bold text-slate-900 dark:text-white">{appliedProjects.length}</p>
+                                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Applications</p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-amber-400">
-                                <CalendarCheck className="w-6 h-6" />
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                                <CalendarCheck className="w-5 h-5" />
                             </div>
                             <div>
-                                <p className="text-2xl font-black text-slate-900 dark:text-white">{interviewProjects.length}</p>
-                                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Active Interviews</p>
+                                <p className="text-xl font-bold text-slate-900 dark:text-white">{interviewProjects.length}</p>
+                                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Interviews</p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl bg-green-50 dark:bg-green-500/10 flex items-center justify-center text-green-600 dark:text-green-400">
-                                <CheckCircle2 className="w-6 h-6" />
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                                <CheckCircle2 className="w-5 h-5" />
                             </div>
                             <div>
-                                <p className="text-2xl font-black text-slate-900 dark:text-white">{ongoingProjects.length}</p>
-                                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Projects Hired</p>
+                                <p className="text-xl font-bold text-slate-900 dark:text-white">{ongoingProjects.length}</p>
+                                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Hired Roles</p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center text-purple-600 dark:text-purple-400">
-                                <MessageSquare className="w-6 h-6" />
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300">
+                                <MessageSquare className="w-5 h-5" />
                             </div>
                             <div>
-                                <p className="text-2xl font-black text-slate-900 dark:text-white">{threads.length}</p>
-                                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Active Chats</p>
+                                <p className="text-xl font-bold text-slate-900 dark:text-white">{threads.length}</p>
+                                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Messages</p>
                             </div>
                         </div>
                     </div>
                 </div>
-                {/*  --- END Welcome Analytics Card --- */}
 
                 {/* Next Best Action Banner */}
-                <div className="mb-8 p-5 rounded-2xl bg-gradient-to-r from-brand-500/10 via-purple-500/5 to-transparent border border-brand-500/20 dark:border-brand-500/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-300">
+                <div className="mb-8 p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-brand-500 text-white rounded-xl shadow-md">
+                        <div className="p-2.5 bg-brand-600 text-white rounded-xl shadow-sm">
                             <TrendingUp className="w-5 h-5" />
                         </div>
                         <div>
-                            <h4 className="text-xs font-black text-brand-650 dark:text-brand-400 uppercase tracking-wider">Next Best Action</h4>
-                            <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mt-1">
+                            <h4 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Next Step</h4>
+                            <p className="text-sm font-semibold text-slate-900 dark:text-slate-200 mt-0.5">
                                 {interviewProjects.length > 0 
                                     ? `You have an active interview invitation for "${interviewProjects[0].title}". View messages to respond.`
                                     : appliedProjects.length > 0
-                                    ? `Address key skill gaps in the Workspace Analytics tab to boost your AI Compatibility Match by up to 40%.`
-                                    : `Start matching with active projects! Browse open listings and apply today to build your portfolio.`
+                                    ? `Address key skill gaps in Workspace Analytics to boost candidate fit scores.`
+                                    : `Explore open listings and submit your application to start building live experience.`
                                 }
                             </p>
                         </div>
@@ -770,195 +764,107 @@ export default function StudentDashboard() {
                                 navigate('/projects');
                             }
                         }}
-                        className="px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl text-xs hover:-translate-y-0.5 transition-all shadow-sm hover:shadow shrink-0"
+                        className="px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold rounded-xl text-xs hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-sm shrink-0"
                     >
-                        {interviewProjects.length > 0 ? "Open Messages" : appliedProjects.length > 0 ? "Check Analytics" : "Browse Projects"}
+                        {interviewProjects.length > 0 ? "Open Messages" : appliedProjects.length > 0 ? "View Analytics" : "Browse Projects"}
                     </button>
                 </div>
 
+                {/* Mobile Tab Selector */}
+                <div className="flex lg:hidden overflow-x-auto no-scrollbar gap-2 mb-6 pb-2 border-b border-slate-200 dark:border-slate-800">
+                    {[
+                        { id: 'applied', label: 'Applied', count: appliedProjects.length },
+                        { id: 'interviews', label: 'Interviews', count: interviewProjects.length },
+                        { id: 'ongoing', label: 'Ongoing', count: ongoingProjects.length },
+                        { id: 'messages', label: 'Messages', count: threads.length },
+                        { id: 'archived', label: 'Archived', count: archivedProjects.length },
+                        { id: 'analytics', label: 'Analytics', count: null }
+                    ].map(tab => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id as StudentTab)}
+                            className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-colors flex items-center gap-1.5 ${
+                                activeTab === tab.id
+                                    ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm'
+                                    : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                            }`}
+                        >
+                            {tab.label}
+                            {tab.count !== null && (
+                                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                                    activeTab === tab.id
+                                        ? 'bg-white/20 text-white dark:bg-slate-900/20 dark:text-slate-900'
+                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                                }`}>
+                                    {tab.count}
+                                </span>
+                            )}
+                        </button>
+                    ))}
+                </div>
+
                 <div className="flex flex-col lg:flex-row gap-8">
-                    {/* Sidebar / Navigation Cards (Hidden on Mobile) */}
-                    <div className="hidden lg:flex flex-col w-64 flex-shrink-0 space-y-3">
-                        <button
-                            onClick={() => { setActiveTab('applied'); window.location.hash = ''; }}
-                            className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all border ${activeTab === 'applied'
-                                ? 'bg-brand-600 text-white border-brand-600 shadow-md shadow-brand-500/20'
-                                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-brand-500 text-slate-700 dark:text-slate-300'
-                                }`}
-                        >
-                            <span className="flex items-center font-bold">
-                                <Briefcase className={`w-5 h-5 mr-3 ${activeTab === 'applied' ? 'text-white' : 'text-brand-500'}`} />
-                                Applied
-                            </span>
-                            <span className={`text-xs font-black px-2 py-1 rounded-lg ${activeTab === 'applied' ? 'bg-white/20' : 'bg-slate-100 dark:bg-slate-800'}`}>
-                                {appliedProjects.length}
-                            </span>
-                        </button>
-
-                        <button
-                            onClick={() => { setActiveTab('interviews'); window.location.hash = ''; }}
-                            className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all border ${activeTab === 'interviews'
-                                ? 'bg-amber-500 text-white border-amber-500 shadow-md shadow-amber-500/20'
-                                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-amber-500 text-slate-700 dark:text-slate-300'
-                                }`}
-                        >
-                            <span className="flex items-center font-bold">
-                                <CalendarCheck className={`w-5 h-5 mr-3 ${activeTab === 'interviews' ? 'text-white' : 'text-amber-500'}`} />
-                                Interviews
-                            </span>
-                            <span className={`text-xs font-black px-2 py-1 rounded-lg ${activeTab === 'interviews' ? 'bg-white/20' : 'bg-slate-100 dark:bg-slate-800'}`}>
-                                {interviewProjects.length}
-                            </span>
-                        </button>
-
-                        <button
-                            onClick={() => { setActiveTab('ongoing'); window.location.hash = ''; }}
-                            className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all border ${activeTab === 'ongoing'
-                                ? 'bg-green-600 text-white border-green-600 shadow-md shadow-green-500/20'
-                                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-green-600 text-slate-700 dark:text-slate-300'
-                                }`}
-                        >
-                            <span className="flex items-center font-bold">
-                                <CheckCircle2 className={`w-5 h-5 mr-3 ${activeTab === 'ongoing' ? 'text-white' : 'text-green-500'}`} />
-                                Ongoing
-                            </span>
-                            <span className={`text-xs font-black px-2 py-1 rounded-lg ${activeTab === 'ongoing' ? 'bg-white/20' : 'bg-slate-100 dark:bg-slate-800'}`}>
-                                {ongoingProjects.length}
-                            </span>
-                        </button>
-
-
-
-                        <button
-                            onClick={() => { setActiveTab('messages'); window.location.hash = ''; }}
-                            className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all border ${activeTab === 'messages'
-                                ? 'bg-purple-600 text-white border-purple-600 shadow-md shadow-purple-500/20'
-                                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-purple-600 text-slate-700 dark:text-slate-300'
-                                }`}
-                        >
-                            <span className="flex items-center font-bold">
-                                <MessageSquare className={`w-5 h-5 mr-3 ${activeTab === 'messages' ? 'text-white' : 'text-purple-500'}`} />
-                                Messages
-                            </span>
-                            <span className={`text-xs font-black px-2 py-1 rounded-lg ${activeTab === 'messages' ? 'bg-white/20' : 'bg-slate-100 dark:bg-slate-800'}`}>
-                                {threads.length}
-                            </span>
-                        </button>
-
-                        <button
-                            onClick={() => { setActiveTab('archived'); window.location.hash = ''; }}
-                            className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all border ${activeTab === 'archived'
-                                ? 'bg-slate-800 dark:bg-slate-700 text-white border-slate-800 dark:border-slate-700 shadow-md shadow-slate-900/20'
-                                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-500 text-slate-700 dark:text-slate-300'
-                                }`}
-                        >
-                            <span className="flex items-center font-bold">
-                                <Archive className={`w-5 h-5 mr-3 ${activeTab === 'archived' ? 'text-white' : 'text-slate-500'}`} />
-                                Archived
-                            </span>
-                            <span className={`text-xs font-black px-2 py-1 rounded-lg ${activeTab === 'archived' ? 'bg-white/20' : 'bg-slate-100 dark:bg-slate-800'}`}>
-                                {archivedProjects.length}
-                            </span>
-                        </button>
-
-                        <button
-                            onClick={() => { setActiveTab('analytics'); window.location.hash = ''; }}
-                            className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all border ${activeTab === 'analytics'
-                                ? 'bg-brand-600 text-white border-brand-600 shadow-md shadow-brand-500/20'
-                                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-brand-500 text-slate-700 dark:text-slate-300'
-                                }`}
-                        >
-                            <span className="flex items-center font-bold">
-                                <TrendingUp className={`w-5 h-5 mr-3 ${activeTab === 'analytics' ? 'text-white' : 'text-brand-500'}`} />
-                                Workspace Analytics
-                            </span>
-                            <span className={`text-xs font-black px-2 py-1 rounded-lg ${activeTab === 'analytics' ? 'bg-white/20' : 'bg-slate-100 dark:bg-slate-800'}`}>
-                                metrics
-                            </span>
-                        </button>
+                    {/* Desktop Sidebar Tabs */}
+                    <div className="hidden lg:flex flex-col w-64 flex-shrink-0 space-y-2">
+                        {[
+                            { id: 'applied', label: 'Applied Projects', icon: Briefcase, count: appliedProjects.length },
+                            { id: 'interviews', label: 'Interviews', icon: CalendarCheck, count: interviewProjects.length },
+                            { id: 'ongoing', label: 'Ongoing Projects', icon: CheckCircle2, count: ongoingProjects.length },
+                            { id: 'messages', label: 'Messages', icon: MessageSquare, count: threads.length },
+                            { id: 'archived', label: 'Archived', icon: Archive, count: archivedProjects.length },
+                            { id: 'analytics', label: 'Workspace Analytics', icon: TrendingUp, count: null }
+                        ].map((tab) => {
+                            const isSelected = activeTab === tab.id;
+                            return (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id as StudentTab)}
+                                    className={`w-full flex items-center justify-between p-3.5 rounded-xl transition-colors border text-sm font-semibold ${
+                                        isSelected
+                                            ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-slate-900 dark:border-white shadow-sm'
+                                            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:border-slate-300 dark:hover:border-slate-700'
+                                    }`}
+                                >
+                                    <span className="flex items-center gap-3">
+                                        <tab.icon className={`w-4 h-4 ${isSelected ? 'text-white dark:text-slate-900' : 'text-slate-400'}`} />
+                                        {tab.label}
+                                    </span>
+                                    {tab.count !== null && (
+                                        <span className={`text-xs font-bold px-2 py-0.5 rounded-lg ${
+                                            isSelected
+                                                ? 'bg-white/20 text-white dark:bg-slate-900/10 dark:text-slate-900'
+                                                : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                                        }`}>
+                                            {tab.count}
+                                        </span>
+                                    )}
+                                </button>
+                            );
+                        })}
                     </div>
 
-                    {/* Desktop Main Content Area (Hidden on Mobile unless hash is active) */}
-                    <div className="hidden lg:block flex-1">
+                    {/* Main Content Area */}
+                    <div className="flex-1 min-w-0">
                         <div className="mb-6 border-b border-slate-200 dark:border-slate-800 pb-4">
-                            <h2 className="text-xl font-bold text-slate-900 dark:text-white capitalize flex items-center gap-2">
+                            <h2 className="text-xl font-bold font-heading text-slate-900 dark:text-white capitalize flex items-center gap-2">
                                 {activeTab} Projects
                             </h2>
                             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                                 {activeTab === 'applied' && "Projects you have recently applied to."}
-                                {activeTab === 'interviews' && "Projects where you have been accepted for an interview."}
-                                {activeTab === 'ongoing' && "Congratulations! You have been hired for these projects."}
-                                {activeTab === 'messages' && "Communications with recruiters for your applied projects."}
-                                {activeTab === 'archived' && "Projects that have concluded. View them here, but completion certificates live on the Completed Projects page."}
-                                {activeTab === 'analytics' && "Track your application lifecycle conversion and address skill gaps."}
+                                {activeTab === 'interviews' && "Projects where you have been invited for an interview."}
+                                {activeTab === 'ongoing' && "Active project collaborations and hired roles."}
+                                {activeTab === 'messages' && "Communications with recruiters for your active opportunities."}
+                                {activeTab === 'archived' && "Applications and completed projects that have concluded."}
+                                {activeTab === 'analytics' && "Track your application lifecycle conversion and address key skill gaps."}
                             </p>
                         </div>
 
-                        {activeTab === 'applied' && renderProjectsList(appliedProjects, "You haven't applied to any live projects yet. Start hunting to build your portfolio!", 'briefcase')}
+                        {activeTab === 'applied' && renderProjectsList(appliedProjects, "You haven't applied to any live projects yet. Start browsing to build your portfolio!", 'briefcase')}
                         {activeTab === 'interviews' && renderProjectsList(interviewProjects, "You don't have any scheduled interviews right now. Keep applying to land one!", 'briefcase')}
-                        {activeTab === 'ongoing' && renderProjectsList(ongoingProjects, "You aren't currently part of any active selections. Your time will come!", 'briefcase')}
+                        {activeTab === 'ongoing' && renderProjectsList(ongoingProjects, "You don't have any ongoing project contracts at the moment.", 'briefcase')}
                         {activeTab === 'messages' && <StudentMessagingHub threads={threads} />}
-                        {activeTab === 'archived' && renderProjectsList(archivedProjects, "None of your recent applications have been archived yet.", 'archive')}
+                        {activeTab === 'archived' && renderProjectsList(archivedProjects, "None of your applications have been archived yet.", 'archive')}
                         {activeTab === 'analytics' && renderStudentAnalytics()}
-                    </div>
-
-                    {/* Mobile Unified Main Content Area */}
-                    <div className="block lg:hidden flex-1 space-y-8">
-                        {/* If they tapped a specific tab on the bottom nav, show only that */}
-                        {window.location.hash === '#applications' && (
-                            <div>
-                                <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">My Applications</h2>
-                                {renderProjectsList(appliedProjects, "You haven't applied to any live projects yet.", 'briefcase')}
-                            </div>
-                        )}
-                        {window.location.hash === '#projects' && (
-                            <div>
-                                <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Active Projects</h2>
-                                {renderProjectsList(ongoingProjects, "You don't have any active projects right now.", 'briefcase')}
-                            </div>
-                        )}
-                        {window.location.hash === '#messages' && (
-                            <StudentMessagingHub threads={threads} />
-                        )}
-                        {window.location.hash === '#analytics' && (
-                            renderStudentAnalytics()
-                        )}
-                        
-                        {/* If they are on the default home view (no hash), show the vertical Action-Oriented feed */}
-                        {(!window.location.hash || window.location.hash === '') && (
-                            <>
-                                {/* Action Required */}
-                                {(interviewProjects.length > 0 || ongoingProjects.length > 0) && (
-                                    <section>
-                                        <h3 className="text-lg font-bold text-brand-600 dark:text-brand-400 mb-4 flex items-center gap-2">
-                                            <CalendarCheck className="w-5 h-5" /> Action Required
-                                        </h3>
-                                        <div className="space-y-4">
-                                            {renderProjectsList(interviewProjects, "", 'briefcase')}
-                                            {renderProjectsList(ongoingProjects, "", 'briefcase')}
-                                        </div>
-                                    </section>
-                                )}
-
-                                {/* Quick Links */}
-                                <section className="grid grid-cols-2 gap-4">
-                                    <button onClick={() => window.location.hash = '#messages'} className="flex flex-col items-center justify-center p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800/50 rounded-2xl text-purple-700 dark:text-purple-400 gap-2 font-semibold">
-                                        <MessageSquare className="w-6 h-6" />
-                                        Messages
-                                    </button>
-                                    <button onClick={() => window.location.hash = '#analytics'} className="flex flex-col items-center justify-center p-4 bg-brand-50 dark:bg-brand-900/20 border border-brand-100 dark:border-brand-800/50 rounded-2xl text-brand-700 dark:text-brand-400 gap-2 font-semibold">
-                                        <TrendingUp className="w-6 h-6" />
-                                        Analytics
-                                    </button>
-                                </section>
-
-                                {/* Recent Activity */}
-                                <section>
-                                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Recent Applications</h3>
-                                    {renderProjectsList(appliedProjects.slice(0, 5), "You haven't applied to any live projects yet.", 'briefcase')}
-                                </section>
-                            </>
-                        )}
                     </div>
                 </div>
             </div>

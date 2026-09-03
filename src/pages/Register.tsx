@@ -192,7 +192,7 @@ const Register = () => {
     }
 
     return (
-        <div className="relative min-h-screen pt-24 pb-12 flex flex-col justify-center sm:px-6 lg:px-8 bg-slate-50 dark:bg-[#0b0f19] transition-colors duration-300 overflow-hidden">
+        <div className="relative min-h-screen py-12 flex flex-col justify-center sm:px-6 lg:px-8 bg-slate-50 dark:bg-[#0b0f19] transition-colors duration-200 overflow-hidden">
             {/* Clean Flat Background */}
             <div className="absolute inset-0 pointer-events-none z-0" />
 
@@ -376,31 +376,24 @@ const Register = () => {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="relative w-full flex justify-center py-3.5 px-4 rounded-2xl shadow-md shadow-brand-500/20 text-white font-bold text-base focus:outline-none overflow-hidden group/btn bg-brand-600 disabled:opacity-70 disabled:cursor-not-allowed"
+                                className="w-full flex justify-center items-center py-3.5 px-4 rounded-xl shadow-sm text-white font-bold text-sm bg-brand-600 hover:bg-brand-700 dark:bg-brand-500 dark:hover:bg-brand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
                             >
-                                <div className="absolute inset-0 bg-brand-600 hover:bg-brand-500 transition-colors"></div>
-                                <span className="absolute w-0 h-0 transition-all duration-500 ease-out bg-white rounded-full group-hover/btn:w-56 group-hover/btn:h-56 opacity-10 blur-xl"></span>
-                                <span className="relative flex items-center gap-2">
-                                    {isLoading ? (
-                                        <>
-                                            <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                            </svg>
-                                            Processing...
-                                        </>
-                                    ) : (
-                                        step === 1 ? 'Continue to Email Verification' :
-                                            step === 2 ? 'Return to Login' : 'Create account'
-                                    )}
-                                </span>
+                                {isLoading ? (
+                                    <span className="flex items-center gap-2">
+                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                        Processing...
+                                    </span>
+                                ) : (
+                                    step === 1 ? (isRecruiter ? 'Create Recruiter Account' : 'Create Student Account') :
+                                        step === 2 ? 'Return to Login' : 'Create Account'
+                                )}
                             </button>
                             {step > 1 && (
                                 <button
                                     type="button"
                                     onClick={() => setStep(step - 1)}
                                     disabled={isLoading}
-                                    className="w-full flex justify-center py-3.5 px-4 rounded-2xl text-slate-600 dark:text-slate-400 font-bold text-base hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-70"
+                                    className="w-full flex justify-center py-3 px-4 rounded-xl text-slate-600 dark:text-slate-400 font-medium text-sm hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-70"
                                 >
                                     Back
                                 </button>
@@ -453,10 +446,8 @@ const Register = () => {
                     )}
                 </div>
 
-                <p className="mt-6 text-center text-xs text-slate-600 dark:text-slate-500 relative z-10">
-                    By registering, you agree to our{' '}
-                    <a href="#" className="font-semibold text-brand-600 hover:text-brand-700 dark:text-slate-400 dark:hover:text-brand-400 transition-colors">Terms of Service</a> and{' '}
-                    <a href="#" className="font-semibold text-brand-600 hover:text-brand-700 dark:text-slate-400 dark:hover:text-brand-400 transition-colors">Privacy Policy</a>.
+                <p className="mt-6 text-center text-xs text-slate-500 dark:text-slate-400 relative z-10">
+                    By registering, you agree to ProjectMatch terms and academic safety standards.
                 </p>
 
                 <div className="mt-6 text-center text-sm text-slate-600 dark:text-slate-400 relative z-10">

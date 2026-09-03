@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Briefcase, Users, PlusCircle, MapPin, Clock, FileText, Download, CheckCircle, MessageSquare, TrendingUp } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import PostProjectModal, { type ProjectFormData } from '../components/recruiter/PostProjectModal';
 import StudentProfileCard, { type StudentProfile } from '../components/recruiter/StudentProfileCard';
 import StudentProfileModal from '../components/recruiter/StudentProfileModal';
@@ -18,13 +18,21 @@ import { useCallback } from 'react';
 import EmptyState from '../components/ui/EmptyState';
 import PageSkeleton from '../components/common/PageSkeleton';
 
+const VALID_RECRUITER_TABS = ['projects', 'talent', 'collaborated', 'messages', 'analytics'] as const;
+type RecruiterTab = typeof VALID_RECRUITER_TABS[number];
 
 const RecruiterDashboard = () => {
     const { userName, userId } = useAuth();
     const location = useLocation();
+    const [searchParams, setSearchParams] = useSearchParams();
     
-    // Default to projects, but let hash override if present
-    const [activeTab, setActiveTab] = useState<'projects' | 'talent' | 'collaborated' | 'messages' | 'analytics'>('projects');
+    const tabParam = searchParams.get('tab') as RecruiterTab;
+    const activeTab: RecruiterTab = VALID_RECRUITER_TABS.includes(tabParam) ? tabParam : 'projects';
+
+    const setActiveTab = useCallback((tab: RecruiterTab) => {
+        setSearchParams({ tab });
+    }, [setSearchParams]);
+
     const [selectedProject, setSelectedProject] = useState<any | null>(null);
     const [targetMessageThreadId, setTargetMessageThreadId] = useState<string | null>(null);
     const [activeProjects, setActiveProjects] = useState<any[]>([]);
@@ -37,19 +45,19 @@ const RecruiterDashboard = () => {
     const [talentProfiles, setTalentProfiles] = useState<any[]>([]);
     const [colleges, setColleges] = useState<string[]>([]);
 
-    // Fetch projects and their applications from Supabase
+    // Scroll to top on tab change
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [activeTab]);
 
-    // Sync tab with hash route
+    // Sync tab with legacy hash route
     useEffect(() => {
         const hash = location.hash.replace('#', '');
         if (hash === 'projects') setActiveTab('projects');
         else if (hash === 'candidates') setActiveTab('talent');
         else if (hash === 'inbox') setActiveTab('messages');
         else if (hash === 'analytics') setActiveTab('analytics');
-    }, [location.hash]);
+    }, [location.hash, setActiveTab]);
 
     const fetchRecruiterData = useCallback(async () => {
         if (!userId) return;
@@ -1094,17 +1102,17 @@ const RecruiterDashboard = () => {
     }
 
     return (
-        <div className="min-h-screen pt-24 pb-24 md:pb-12 bg-slate-50 dark:bg-slate-950">
+        <div className="min-h-screen pt-8 pb-20 bg-slate-50 dark:bg-[#0b0f19] transition-colors duration-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
                 {/* Dashboard Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
                     <div>
-                        <h1 className="text-4xl font-extrabold font-heading text-slate-900 dark:text-white tracking-tight">
+                        <h1 className="text-3xl md:text-4xl font-bold font-heading text-slate-900 dark:text-white tracking-tight">
                             Recruiter Dashboard
                         </h1>
-                        <p className="mt-2 text-lg text-slate-600 dark:text-slate-400">
-                            Manage your live projects and discover top student talent.
+                        <p className="mt-2 text-base text-slate-600 dark:text-slate-400">
+                            Manage your live projects and evaluate qualified student candidates.
                         </p>
                     </div>
                     {activeTab === 'projects' && (
@@ -1113,9 +1121,9 @@ const RecruiterDashboard = () => {
                                 setEditingProjectData(null);
                                 setIsPostProjectModalOpen(true);
                             }}
-                            className="flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-medium py-3 px-6 rounded-xl transition-all shadow-md shadow-brand-500/20 hover:shadow-lg hover:shadow-brand-500/40 hover:-translate-y-0.5"
+                            className="flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 dark:bg-brand-500 dark:hover:bg-brand-600 text-white font-semibold py-2.5 px-5 rounded-xl transition-colors shadow-sm"
                         >
-                            <PlusCircle className="w-5 h-5" /> Post New Project
+                            <PlusCircle className="w-4 h-4" /> Post New Project
                         </button>
                     )}
                 </div>
@@ -1128,19 +1136,19 @@ const RecruiterDashboard = () => {
                     });
 
                     return (
-                        <div className="mb-8 p-5 rounded-2xl bg-gradient-to-r from-brand-500/10 via-indigo-500/5 to-transparent border border-brand-500/20 dark:border-brand-500/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-300">
+                        <div className="mb-8 p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                             <div className="flex items-center gap-4">
-                                <div className="p-3 bg-brand-600 text-white rounded-xl shadow-md">
+                                <div className="p-2.5 bg-brand-600 text-white rounded-xl shadow-sm">
                                     <TrendingUp className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <h4 className="text-xs font-black text-brand-650 dark:text-brand-400 uppercase tracking-wider">Next Best Action</h4>
-                                    <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mt-1">
+                                    <h4 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Next Step</h4>
+                                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-200 mt-0.5">
                                         {totalPendingApps > 0
-                                            ? `You have ${totalPendingApps} pending applicants awaiting review. Open "My Projects" to update their funnel stage.`
+                                            ? `You have ${totalPendingApps} pending applicant${totalPendingApps > 1 ? 's' : ''} awaiting review. Open "My Projects" to advance candidate stages.`
                                             : activeProjects.length > 0
-                                            ? `Invite matching candidate profiles to your active projects from the "Discover Talent" tab.`
-                                            : `Post your first project to start receiving applications from verified student developers.`
+                                            ? `Invite qualified student profiles to your active projects from the "Discover Talent" tab.`
+                                            : `Publish your first live project listing to start receiving student applications.`
                                         }
                                     </p>
                                 </div>
@@ -1156,7 +1164,7 @@ const RecruiterDashboard = () => {
                                         setIsPostProjectModalOpen(true);
                                     }
                                 }}
-                                className="px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl text-xs hover:-translate-y-0.5 transition-all shadow-sm hover:shadow shrink-0"
+                                className="px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold rounded-xl text-xs hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-sm shrink-0"
                             >
                                 {totalPendingApps > 0 ? "Review Applicants" : activeProjects.length > 0 ? "Find Talent" : "Create Project"}
                             </button>

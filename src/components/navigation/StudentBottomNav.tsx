@@ -1,42 +1,56 @@
 import { Home, Compass, FileText, Briefcase, User } from 'lucide-react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, Link, useSearchParams } from 'react-router-dom';
 
 const StudentBottomNav = () => {
     const { pathname } = useLocation();
-    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const currentTab = searchParams.get('tab');
+    const hash = window.location.hash;
 
     const items = [
-        { label: 'Home', icon: Home, route: '/dashboard/student' },
-        { label: 'Explore', icon: Compass, route: '/projects' },
-        // For Applications and Projects, they currently live on the dashboard via state tabs.
-        // We will route them to dashboard with a hash to trigger the specific tab.
-        { label: 'Applications', icon: FileText, route: '/dashboard/student#applications' },
-        { label: 'Projects', icon: Briefcase, route: '/dashboard/student#projects' },
-        { label: 'Profile', icon: User, route: '/settings' }
+        { label: 'Home', icon: Home, route: '/dashboard/student', tab: null },
+        { label: 'Explore', icon: Compass, route: '/projects', tab: null },
+        { label: 'Applied', icon: FileText, route: '/dashboard/student?tab=applied', tab: 'applied' },
+        { label: 'Projects', icon: Briefcase, route: '/dashboard/student?tab=ongoing', tab: 'ongoing' },
+        { label: 'Profile', icon: User, route: '/settings', tab: null }
     ];
 
     return (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 pb-safe z-50">
-            <div className="flex items-center justify-around h-16 px-2">
+        <nav
+            aria-label="Student mobile navigation"
+            className="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 pb-safe z-50 transition-colors duration-200"
+        >
+            <div className="flex items-center justify-around h-16 px-1 max-w-lg mx-auto">
                 {items.map((item) => {
-                    // For Home vs Applications vs Projects which are all on /dashboard/student
-                    const isStrictlyActive = item.route.includes('#') 
-                        ? window.location.hash === '#' + item.route.split('#')[1]
-                        : pathname === item.route && (!window.location.hash || window.location.hash === '');
+                    let isStrictlyActive = false;
+
+                    if (item.tab) {
+                        isStrictlyActive = pathname === '/dashboard/student' && (
+                            currentTab === item.tab ||
+                            (item.tab === 'applied' && hash === '#applications') ||
+                            (item.tab === 'ongoing' && hash === '#projects')
+                        );
+                    } else if (item.route === '/dashboard/student') {
+                        isStrictlyActive = pathname === '/dashboard/student' && (!currentTab || currentTab === 'applied') && (!hash || hash === '');
+                    } else {
+                        isStrictlyActive = pathname === item.route;
+                    }
 
                     return (
-                        <button
+                        <Link
                             key={item.label}
-                            onClick={() => navigate(item.route)}
-                            className={`flex flex-col items-center justify-center w-16 h-full gap-1 transition-colors ${
+                            to={item.route}
+                            aria-label={item.label}
+                            aria-current={isStrictlyActive ? 'page' : undefined}
+                            className={`flex flex-col items-center justify-center min-w-[48px] min-h-[48px] px-2 py-1 gap-1 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${
                                 isStrictlyActive
-                                    ? 'text-brand-600 dark:text-brand-400'
-                                    : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
+                                    ? 'text-brand-600 dark:text-brand-400 font-bold'
+                                    : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 font-medium'
                             }`}
                         >
-                            <item.icon className={`w-5 h-5 ${isStrictlyActive ? 'fill-brand-50 dark:fill-brand-900/30' : ''}`} />
-                            <span className="text-[10px] font-semibold">{item.label}</span>
-                        </button>
+                            <item.icon className="w-5 h-5" strokeWidth={isStrictlyActive ? 2.5 : 2} />
+                            <span className="text-[10px] tracking-tight">{item.label}</span>
+                        </Link>
                     );
                 })}
             </div>

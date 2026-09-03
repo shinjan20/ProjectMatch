@@ -86,8 +86,8 @@ const Login = () => {
                             </div>
                         </Link>
                     </div>
-                    <h2 className="mt-2 text-center text-3xl md:text-4xl font-extrabold font-heading tracking-tight text-slate-900 dark:text-white">
-                        Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-purple-500 dark:from-brand-400 dark:to-purple-400">ProjectMatch</span>
+                    <h2 className="mt-2 text-center text-3xl md:text-4xl font-bold font-heading tracking-tight text-slate-900 dark:text-white">
+                        Welcome to <span className="text-brand-600 dark:text-brand-400">ProjectMatch</span>
                     </h2>
                     <p className="mt-3 text-center text-base text-slate-600 dark:text-slate-400">
                         Choose how you want to continue
@@ -138,7 +138,7 @@ const Login = () => {
     }
 
     return (
-        <div className="relative min-h-screen pt-24 pb-12 flex flex-col justify-center sm:px-6 lg:px-8 bg-slate-50 dark:bg-[#0b0f19] transition-colors duration-300 overflow-hidden">
+        <div className="relative min-h-screen py-12 flex flex-col justify-center sm:px-6 lg:px-8 bg-slate-50 dark:bg-[#0b0f19] transition-colors duration-200 overflow-hidden">
             {/* Clean Flat Background */}
             <div className="absolute inset-0 pointer-events-none z-0" />
 

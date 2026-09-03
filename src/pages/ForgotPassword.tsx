@@ -38,15 +38,7 @@ const ForgotPassword = () => {
     };
 
     return (
-        <div className="relative min-h-screen pt-24 pb-12 flex flex-col justify-center sm:px-6 lg:px-8 bg-slate-50 dark:bg-[#030712] transition-colors duration-500 overflow-hidden">
-            {/* Animated Mesh Background Splashes */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-brand-500/20 dark:bg-brand-500/10 blur-[120px] animate-blob mix-blend-multiply dark:mix-blend-screen"></div>
-                <div className="absolute top-[20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-purple-500/20 dark:bg-purple-500/10 blur-[120px] animate-blob animation-delay-2000 mix-blend-multiply dark:mix-blend-screen"></div>
-                {/* Noise texture overlay for texture */}
-                <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] mix-blend-overlay" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }}></div>
-            </div>
-
+        <div className="relative min-h-screen py-12 flex flex-col justify-center sm:px-6 lg:px-8 bg-slate-50 dark:bg-[#0b0f19] transition-colors duration-200 overflow-hidden">
             <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <div className="flex justify-center mb-6">
                     <Link to="/" className="flex items-center gap-2 group">
@@ -58,7 +50,7 @@ const ForgotPassword = () => {
                         </div>
                     </Link>
                 </div>
-                <h2 className="mt-2 text-center text-3xl md:text-4xl font-extrabold font-heading tracking-tight text-slate-900 dark:text-white">
+                <h2 className="mt-2 text-center text-3xl md:text-4xl font-bold font-heading tracking-tight text-slate-900 dark:text-white">
                     Reset your password
                 </h2>
                 <p className="mt-3 text-center text-sm text-slate-600 dark:text-slate-400 max-w-sm mx-auto">
@@ -69,9 +61,7 @@ const ForgotPassword = () => {
             </div>
 
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="glass-card py-10 px-6 sm:px-10 relative overflow-hidden">
-                    {/* Decorative blob */}
-                    <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 rounded-full bg-brand-500/10 blur-2xl"></div>
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm py-10 px-6 sm:px-10">
 
                     {error && (
                         <div className="mb-6 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-xl flex items-start gap-3 animate-in fade-in zoom-in-95 duration-300">

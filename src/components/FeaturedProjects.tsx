@@ -54,7 +54,7 @@ const FeaturedProjects = () => {
 
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                     {featuredList.map((project) => (
-                        <div key={project.id} className="glass-card p-4 sm:p-6 flex flex-col group cursor-pointer interactive-glow hover:border-brand-500/50 hover:shadow-[0_0_30px_rgba(99,102,241,0.15)]">
+                        <div key={project.id} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 flex flex-col group cursor-pointer hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md transition-all">
                             <div className="mb-4 flex items-start justify-between">
                                 <span className="inline-flex px-3 py-1 rounded-full bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 text-xs font-semibold tracking-wide uppercase">
                                     {project.category}

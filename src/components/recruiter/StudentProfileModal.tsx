@@ -242,9 +242,7 @@ const StudentProfileModal = ({ isOpen, onClose, profile, hasActiveProjects, acti
                     </div>
                 ) : (
                     /* LOCKED STATE */
-                    <div className="p-8 pb-10 text-center relative overflow-hidden">
-                        {/* Abstract blurred background shapes */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 rounded-full blur-3xl -z-10 opacity-70"></div>
+                    <div className="p-8 pb-10 text-center relative overflow-hidden bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-200 dark:border-slate-800">
 
                         <div className="w-24 h-24 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl relative z-10">
                             <Lock className="w-10 h-10 text-slate-400 dark:text-slate-500" />

@@ -222,13 +222,34 @@
   /* ============================================================
      INTERACTIVE & FORM UTILITIES
      ============================================================ */
-  .btn-interactive   { @apply transition-all duration-200 active:opacity-90; }
+  .btn-interactive   { @apply transition-colors duration-150 active:opacity-90; }
   .interactive-glow:hover { box-shadow: none; }
-  .input-interactive { @apply transition-all duration-200 focus:shadow-sm; }
+  .input-interactive { @apply transition-colors duration-150 focus:shadow-sm; }
+
+  /* Accessible focus indicators (Guideline #8) */
+  :focus-visible {
+    outline: 2px solid #4f46e5;
+    outline-offset: 2px;
+  }
+
+  /* Safe Area Bottom Padding for mobile navigation */
+  .pb-safe {
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), 0.5rem);
+  }
 
   /* Hide scrollbar — used in horizontal overflow tab rows */
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Reduced motion preference (Guideline #19) */
+  @media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 
   /* Animated utilities */
   @keyframes scroll {

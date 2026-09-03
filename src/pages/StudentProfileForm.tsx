@@ -108,51 +108,41 @@ const StudentProfileForm = () => {
     };
 
     return (
-        <div className="min-h-screen pt-24 pb-12 flex flex-col justify-center sm:px-6 lg:px-8 bg-slate-50 dark:bg-[#030712] transition-colors duration-500 overflow-hidden">
-            {/* Animated Mesh Background Splashes */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-brand-500/20 dark:bg-brand-500/10 blur-[120px] animate-blob mix-blend-multiply dark:mix-blend-screen"></div>
-                <div className="absolute top-[20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-purple-500/20 dark:bg-purple-500/10 blur-[120px] animate-blob animation-delay-2000 mix-blend-multiply dark:mix-blend-screen"></div>
-            </div>
-
-            <div className="sm:mx-auto sm:w-full sm:max-w-2xl relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="min-h-screen py-12 flex flex-col justify-center sm:px-6 lg:px-8 bg-slate-50 dark:bg-[#0b0f19] transition-colors duration-200">
+            <div className="sm:mx-auto sm:w-full sm:max-w-2xl relative z-10 animate-in fade-in duration-300">
                 <div className="text-center mb-8">
-                    <div className="flex justify-center mb-6">
-                        <div className="bg-gradient-to-br from-brand-500 to-purple-600 p-4 rounded-3xl shadow-2xl shadow-brand-500/20">
-                            <Briefcase className="w-10 h-10 text-white" />
+                    <div className="flex justify-center mb-5">
+                        <div className="bg-brand-600 dark:bg-brand-500 p-3.5 rounded-2xl shadow-sm text-white">
+                            <Briefcase className="w-8 h-8" />
                         </div>
                     </div>
-                    <h2 className="text-3xl md:text-4xl font-extrabold font-heading tracking-tight text-slate-900 dark:text-white">
-                        Welcome, {userName || 'Student'}! 👋
+                    <h2 className="text-2xl md:text-3xl font-bold font-heading tracking-tight text-slate-900 dark:text-white">
+                        Complete your profile, {userName || 'Student'}
                     </h2>
-                    <p className="mt-4 text-base text-slate-600 dark:text-slate-400">
-                        Let's set up your profile so recruiters can find you for the best live projects.
+                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+                        Help verified companies match you with relevant live opportunities.
                     </p>
                 </div>
 
-                <div className="glass-card sm:p-10 p-6 shadow-2xl shadow-brand-500/5 relative overflow-hidden">
-                    {/* Decorative blob inside card */}
-                    <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 rounded-full bg-brand-500/10 blur-2xl pointer-events-none"></div>
-
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 sm:p-10 p-6 shadow-sm">
                     <ProfanityWarningModal error={error} onClose={() => setError('')} />
                     {error && (
-                        <div className={`mb-6 bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-xl items-start gap-3 text-sm animate-in fade-in zoom-in duration-300 ${(error.toLowerCase().includes('inappropriate') || error.toLowerCase().includes('professional')) ? 'hidden md:flex' : 'flex'}`}>
+                        <div className={`mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 p-4 rounded-xl items-start gap-3 text-sm animate-in fade-in duration-200 ${(error.toLowerCase().includes('inappropriate') || error.toLowerCase().includes('professional')) ? 'hidden md:flex' : 'flex'}`}>
                             <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                             <p>{error}</p>
                         </div>
                     )}
 
-                    <form noValidate onSubmit={handleSubmit} className="space-y-6 relative z-10">
-
+                    <form noValidate onSubmit={handleSubmit} className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* College Field */}
                             <div className="col-span-1 md:col-span-2">
                                 <label htmlFor="college" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                                    College / University Name
+                                    College / University <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative group">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                        <Building2 className="h-5 w-5 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
+                                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                        <Building2 className="h-5 w-5 text-slate-400 group-focus-within:text-brand-600 transition-colors" />
                                     </div>
                                     <input
                                         id="college"
@@ -160,8 +150,8 @@ const StudentProfileForm = () => {
                                         required
                                         value={college}
                                         onChange={(e) => setCollege(e.target.value)}
-                                        placeholder="e.g. Indian Institute of Technology"
-                                        className="block w-full pl-11 pr-4 py-3.5 border border-slate-200 dark:border-slate-800 rounded-2xl bg-white/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:bg-white dark:focus:bg-slate-950 transition-all shadow-sm"
+                                        placeholder="e.g. University of California, Berkeley"
+                                        className="block w-full pl-10 pr-4 py-3 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white dark:focus:bg-slate-900 transition-colors text-sm"
                                     />
                                 </div>
                             </div>
@@ -169,20 +159,20 @@ const StudentProfileForm = () => {
                             {/* Preferred Domain */}
                             <div className="col-span-1 md:col-span-2">
                                 <label htmlFor="domain" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                                    Preferred Domain
+                                    Primary Domain <span className="text-red-500">*</span>
                                 </label>
                                 <div className="relative group">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                        <BookOpen className="h-5 w-5 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
+                                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                        <BookOpen className="h-5 w-5 text-slate-400 group-focus-within:text-brand-600 transition-colors" />
                                     </div>
                                     <select
                                         id="domain"
                                         required
                                         value={domain}
                                         onChange={(e) => setDomain(e.target.value)}
-                                        className="block w-full pl-11 pr-4 py-3.5 border border-slate-200 dark:border-slate-800 rounded-2xl bg-white/50 dark:bg-slate-900/50 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:bg-white dark:focus:bg-slate-950 transition-all shadow-sm appearance-none"
+                                        className="block w-full pl-10 pr-4 py-3 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white dark:focus:bg-slate-900 transition-colors text-sm appearance-none"
                                     >
-                                        <option value="" disabled>Select your primary domain</option>
+                                        <option value="" disabled>Select your primary engineering/design track</option>
                                         {DOMAINS.map(d => (
                                             <option key={d} value={d} className="bg-white dark:bg-slate-900">{d}</option>
                                         ))}
@@ -193,18 +183,18 @@ const StudentProfileForm = () => {
                             {/* Profile Photo Upload */}
                             <div className="col-span-1 md:col-span-2">
                                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                                    Profile Photo <span className="text-slate-400 font-normal">(Optional)</span>
+                                    Profile Picture <span className="text-slate-400 font-normal">(Optional)</span>
                                 </label>
                                 <div
                                     className="relative group cursor-pointer"
                                     onClick={() => photoInputRef.current?.click()}
                                 >
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                        <ImageIcon className="h-5 w-5 text-slate-400 group-hover:text-brand-500 transition-colors" />
+                                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                        <ImageIcon className="h-5 w-5 text-slate-400 group-hover:text-brand-600 transition-colors" />
                                     </div>
-                                    <div className="block w-full pl-11 pr-4 py-3.5 border border-slate-200 dark:border-slate-800 rounded-2xl bg-white/50 dark:bg-slate-900/50 text-slate-900 dark:text-white transition-all shadow-sm flex items-center justify-between hover:border-brand-500/50">
+                                    <div className="block w-full pl-10 pr-4 py-3 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white transition-colors text-sm flex items-center justify-between hover:border-slate-300 dark:hover:border-slate-700">
                                         <span className={photoFile ? "text-slate-900 dark:text-white" : "text-slate-400"}>
-                                            {photoFile ? photoFile.name : "Upload a profile picture..."}
+                                            {photoFile ? photoFile.name : "Select an image file..."}
                                         </span>
                                         <UploadCloud className="w-5 h-5 text-slate-400" />
                                     </div>
@@ -220,26 +210,26 @@ const StudentProfileForm = () => {
                                         }}
                                     />
                                 </div>
-                                <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                                    PNG, JPG up to 5MB.
+                                <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
+                                    PNG, JPG, or WebP up to 5MB.
                                 </p>
                             </div>
 
                             {/* CV / Resume Upload */}
                             <div className="col-span-1 md:col-span-2">
                                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                                    Resume / CV <span className="text-slate-400 font-normal">(Optional)</span>
+                                    Resume / CV Document <span className="text-slate-400 font-normal">(Optional)</span>
                                 </label>
                                 <div
                                     className="relative group cursor-pointer"
                                     onClick={() => resumeInputRef.current?.click()}
                                 >
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                        <FileText className="h-5 w-5 text-slate-400 group-hover:text-brand-500 transition-colors" />
+                                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                        <FileText className="h-5 w-5 text-slate-400 group-hover:text-brand-600 transition-colors" />
                                     </div>
-                                    <div className="block w-full pl-11 pr-4 py-3.5 border border-slate-200 dark:border-slate-800 rounded-2xl bg-white/50 dark:bg-slate-900/50 text-slate-900 dark:text-white transition-all shadow-sm flex items-center justify-between hover:border-brand-500/50">
+                                    <div className="block w-full pl-10 pr-4 py-3 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white transition-colors text-sm flex items-center justify-between hover:border-slate-300 dark:hover:border-slate-700">
                                         <span className={resumeFile ? "text-slate-900 dark:text-white" : "text-slate-400"}>
-                                            {resumeFile ? resumeFile.name : "Upload your resume..."}
+                                            {resumeFile ? resumeFile.name : "Upload PDF or DOCX file..."}
                                         </span>
                                         <UploadCloud className="w-5 h-5 text-slate-400" />
                                     </div>
@@ -255,24 +245,23 @@ const StudentProfileForm = () => {
                                         }}
                                     />
                                 </div>
-                                <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                                    PDF or Word Document up to 10MB.
+                                <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
+                                    PDF or Word document up to 10MB.
                                 </p>
                             </div>
                         </div>
 
-                        <div className="pt-4 mt-2 border-t border-slate-100 dark:border-slate-800/80">
+                        <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
                             <button
                                 type="submit"
                                 disabled={isLoading || !college || !domain}
-                                className="w-full flex justify-center items-center py-4 px-4 border border-transparent rounded-2xl shadow-xl shadow-brand-500/20 text-sm font-bold text-white bg-brand-600 hover:bg-brand-500 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 relative overflow-hidden group"
+                                className="w-full flex justify-center items-center py-3.5 px-4 border border-transparent rounded-xl text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 dark:bg-brand-500 dark:hover:bg-brand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                             >
-                                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
                                 {isLoading ? (
-                                    <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                                 ) : (
-                                    <span className="flex items-center gap-2 relative z-10">
-                                        <CheckCircle2 className="w-5 h-5" /> Complete Profile Check-in
+                                    <span className="flex items-center gap-2">
+                                        <CheckCircle2 className="w-4 h-4" /> Save and Continue to Dashboard
                                     </span>
                                 )}
                             </button>

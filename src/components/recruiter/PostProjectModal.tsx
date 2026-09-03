@@ -202,11 +202,7 @@ const PostProjectModal = ({ isOpen, onClose, onSubmit, editingProject }: PostPro
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#030712]/80 backdrop-blur-xl overflow-y-auto">
-            <div ref={modalRef} className="glass-card w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden mt-10 mb-10 border border-white/10 dark:border-slate-700/50 animate-in fade-in zoom-in-95 duration-300 relative bg-white dark:bg-slate-900">
-
-                {/* Decorative blob inside modal */}
-                <div className="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 rounded-full bg-brand-500/10 blur-3xl pointer-events-none"></div>
-                <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-48 h-48 rounded-full bg-purple-500/10 blur-3xl pointer-events-none"></div>
+            <div ref={modalRef} className="w-full max-w-3xl rounded-2xl shadow-xl overflow-hidden mt-10 mb-10 border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-200 relative bg-white dark:bg-slate-900">
 
                 {/* Header */}
                 <div className="px-6 py-5 border-b border-slate-200 dark:border-slate-800/60 flex justify-between items-center relative z-10">

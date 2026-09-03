@@ -38,15 +38,15 @@ const timeAgo = (dateInput?: string) => {
 const Projects = () => {
     const { isAuthenticated, userRole, hasCompletedProfile, userId } = useAuth();
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const initialBookmarkFilter = searchParams.get('bookmarks') === 'true';
 
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('All');
+    const [searchTerm, setSearchTerm] = useState(searchParams.get('q') || '');
+    const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'All');
 
     // Advanced Filters State
     const [isFiltersModalOpen, setIsFiltersModalOpen] = useState(false);
-    const [sortBy, setSortBy] = useState<'newest' | 'match' | 'deadline'>('newest');
+    const [sortBy, setSortBy] = useState<'newest' | 'match' | 'deadline'>((searchParams.get('sort') as any) || 'newest');
     const [activeFilters, setActiveFilters] = useState({
         duration: [] as string[],
         stipend: '',
@@ -57,6 +57,16 @@ const Projects = () => {
         weeklyCommitment: '',
         deadline: ''
     });
+
+    // Keep URL query parameters in sync with search and filter state
+    useEffect(() => {
+        const params = new URLSearchParams();
+        if (searchTerm.trim()) params.set('q', searchTerm.trim());
+        if (selectedCategory && selectedCategory !== 'All') params.set('category', selectedCategory);
+        if (activeFilters.showBookmarkedOnly) params.set('bookmarks', 'true');
+        if (sortBy !== 'newest') params.set('sort', sortBy);
+        setSearchParams(params, { replace: true });
+    }, [searchTerm, selectedCategory, activeFilters.showBookmarkedOnly, sortBy, setSearchParams]);
 
     // Application Modal State
     const [applyingProjectId, setApplyingProjectId] = useState<string | null>(null);
@@ -324,62 +334,54 @@ const Projects = () => {
     });
 
     return (
-        <div className="relative min-h-screen pt-32 pb-20 bg-slate-50 dark:bg-[#030712] transition-colors duration-500 overflow-hidden">
-            {/* Background elements */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-                <div className="absolute top-[0%] left-[-10%] w-[40%] h-[40%] rounded-full bg-brand-500/20 dark:bg-brand-500/5 blur-[120px] animate-blob mix-blend-multiply dark:mix-blend-screen"></div>
-                <div className="absolute top-[40%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-500/20 dark:bg-purple-500/5 blur-[120px] animate-blob animation-delay-4000 mix-blend-multiply dark:mix-blend-screen"></div>
-                {/* Noise overlay */}
-                <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] mix-blend-overlay" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }}></div>
-            </div>
-
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="relative min-h-screen pt-8 pb-20 bg-slate-50 dark:bg-[#0b0f19] transition-colors duration-200">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
                 {/* Page Header */}
-                <div className="mb-12 text-center sm:text-left">
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-black tracking-tight text-slate-900 dark:text-white mb-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                        Find Your Next <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-purple-500">Live Project</span>
+                <div className="mb-8 text-center sm:text-left">
+                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold tracking-tight text-slate-900 dark:text-white mb-3 animate-in fade-in duration-300">
+                        Find Your Next <span className="text-brand-600 dark:text-brand-400">Live Project</span>
                     </h1>
-                    <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
-                        Browse top-tier remote and on-site projects from industry leaders. Build your resume with real-world experience.
+                    <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl">
+                        Browse verified remote and on-site projects from industry companies. Build your verified portfolio with real deliverables.
                     </p>
                 </div>
 
-                {/* Search and Filters - Glass Command Center */}
-                <div className="glass rounded-[2rem] p-2 md:p-3 mb-10 flex flex-col md:flex-row gap-3 items-center justify-between shadow-2xl shadow-brand-500/5 border border-white/40 dark:border-white/10 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+                {/* Search and Filters - Command Bar */}
+                <div className="bg-white dark:bg-slate-900 rounded-2xl p-2.5 md:p-3 mb-8 flex flex-col md:flex-row gap-3 items-center justify-between shadow-sm border border-slate-200 dark:border-slate-800">
                     <div className="relative w-full md:w-96 flex-shrink-0 group">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <Search className="h-5 w-5 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
+                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                            <Search className="h-4 w-4 text-slate-400 group-focus-within:text-brand-600 transition-colors" />
                         </div>
                         <input
                             type="text"
-                            placeholder="Search roles, companies..."
-                            className="block w-full pl-11 pr-4 py-3.5 border border-transparent rounded-[1.5rem] bg-slate-100/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/50 dark:focus:ring-brand-500/30 focus:bg-white dark:focus:bg-[#030712] transition-all"
+                            placeholder="Search roles, technologies, companies..."
+                            className="block w-full pl-10 pr-4 py-2.5 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white dark:focus:bg-slate-900 transition-colors"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
 
-                    <div className="w-full md:w-auto overflow-x-auto pb-2 md:pb-0 hide-scrollbar flex items-center px-2">
+                    <div className="w-full md:w-auto overflow-x-auto pb-2 md:pb-0 hide-scrollbar flex items-center px-1">
                         <div className="flex gap-2">
                             {CATEGORIES.map(category => (
                                 <button
                                     key={category}
                                     onClick={() => setSelectedCategory(category)}
-                                    className={`whitespace-nowrap px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${selectedCategory === category
-                                        ? 'bg-gradient-to-r from-brand-500 to-purple-600 text-white shadow-lg shadow-brand-500/20 border border-transparent'
-                                        : 'bg-transparent text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-brand-300 dark:hover:border-brand-700 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                                    className={`whitespace-nowrap px-3.5 py-2 rounded-xl text-xs font-bold transition-colors ${selectedCategory === category
+                                        ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm'
+                                        : 'bg-transparent text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50'
                                         }`}
                                 >
                                     {category}
                                 </button>
                             ))}
-                            <div className="flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full px-3.5 py-1.5 ml-2">
-                                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Sort By:</span>
+                            <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 ml-1">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Sort:</span>
                                 <select
                                     value={sortBy}
                                     onChange={(e) => setSortBy(e.target.value as any)}
-                                    className="text-xs font-bold text-slate-700 dark:text-slate-300 bg-transparent border-none outline-none focus:ring-0 cursor-pointer"
+                                    className="text-xs font-semibold text-slate-700 dark:text-slate-300 bg-transparent border-none outline-none cursor-pointer"
                                 >
                                     <option value="newest">Newest</option>
                                     {userRole === 'student' && <option value="match">Best Match</option>}
@@ -388,25 +390,25 @@ const Projects = () => {
                             </div>
 
                             {/* Inline Filters */}
-                            <div className="hidden lg:flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full px-3.5 py-1.5 ml-2">
-                                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Comp:</span>
+                            <div className="hidden lg:flex items-center gap-1 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 ml-1">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Comp:</span>
                                 <select
                                     value={activeFilters.stipend}
                                     onChange={(e) => setActiveFilters(prev => ({ ...prev, stipend: e.target.value }))}
-                                    className="text-xs font-bold text-slate-700 dark:text-slate-300 bg-transparent border-none outline-none focus:ring-0 cursor-pointer w-20"
+                                    className="text-xs font-semibold text-slate-700 dark:text-slate-300 bg-transparent border-none outline-none cursor-pointer w-20"
                                 >
                                     <option value="">Any</option>
                                     <option value="1">Paid Only</option>
                                 </select>
                             </div>
-                            <div className="hidden lg:flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full px-3.5 py-1.5 ml-2">
-                                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Time:</span>
+                            <div className="hidden lg:flex items-center gap-1 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 ml-1">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Time:</span>
                                 <select
                                     value={activeFilters.duration[0] || ''}
                                     onChange={(e) => setActiveFilters(prev => ({ ...prev, duration: e.target.value ? [e.target.value] : [] }))}
-                                    className="text-xs font-bold text-slate-700 dark:text-slate-300 bg-transparent border-none outline-none focus:ring-0 cursor-pointer w-24"
+                                    className="text-xs font-semibold text-slate-700 dark:text-slate-300 bg-transparent border-none outline-none cursor-pointer w-24"
                                 >
-                                    <option value="">Any Duration</option>
+                                    <option value="">Any Length</option>
                                     <option value="1 months">1 month</option>
                                     <option value="2 months">2 months</option>
                                     <option value="3 months">3 months</option>
@@ -415,27 +417,24 @@ const Projects = () => {
                             </div>
                             <button
                                 onClick={() => setIsFiltersModalOpen(true)}
-                                className="flex items-center gap-2 px-4 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-full text-sm font-medium transition-all shadow-xl shadow-slate-900/10 btn-interactive ml-2 relative"
+                                className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl text-xs font-bold transition-colors ml-1 relative"
                             >
-                                <Filter className="w-4 h-4" /> Filters
+                                <Filter className="w-3.5 h-3.5" /> Filters
                                 {(activeFilters.duration.length > 0 || activeFilters.stipend !== '' || activeFilters.skills.length > 0 || activeFilters.workType.length > 0 || activeFilters.showBookmarkedOnly || activeFilters.difficulty !== '' || activeFilters.weeklyCommitment !== '' || activeFilters.deadline !== '') && (
-                                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-brand-500 border-2 border-slate-900 dark:border-white rounded-full"></span>
+                                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-brand-500 rounded-full"></span>
                                 )}
                             </button>
                         </div>
                     </div>
                 </div>
 
-                {/* Projects Grid Container with hover effect */}
-                <div className="group/grid relative">
-                    {/* Underlying glow that activates when hovering any grid item */}
-                    <div className="absolute inset-0 bg-brand-500/5 dark:bg-brand-500/10 blur-[100px] rounded-full opacity-0 group-hover/grid:opacity-100 transition-opacity duration-1000 pointer-events-none"></div>
-
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
+                {/* Projects Grid Container */}
+                <div>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-300">
                         {/* FIX #8: Show skeleton while projects are loading */}
                         {isLoadingProjects ? (
                             Array.from({ length: 6 }).map((_, i) => (
-                                <div key={i} className="glass-card p-4 sm:p-6 flex flex-col animate-pulse">
+                                <div key={i} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 flex flex-col animate-pulse">
                                     <div className="h-4 w-24 bg-slate-200 dark:bg-slate-800 rounded-full mb-5" />
                                     <div className="h-6 w-3/4 bg-slate-200 dark:bg-slate-800 rounded-lg mb-3" />
                                     <div className="h-4 w-1/2 bg-slate-100 dark:bg-slate-800/60 rounded mb-6" />
@@ -448,16 +447,16 @@ const Projects = () => {
                                 <div
                                     key={project.id}
                                     onClick={() => setViewingProjectId(project.id)}
-                                    className="glass-card p-4 sm:p-6 flex flex-col group/card cursor-pointer hover:border-brand-500/50"
+                                    className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 flex flex-col group/card cursor-pointer hover:border-slate-300 dark:hover:border-slate-700 transition-colors shadow-sm"
                                 >
-                                    <div className="mb-5 flex items-start justify-between">
+                                    <div className="mb-4 flex items-start justify-between">
                                         <div className="flex flex-wrap gap-2 items-center">
-                                            <span className="inline-flex px-3 py-1 rounded-full border border-brand-500/30 bg-brand-500/10 text-brand-700 dark:text-brand-300 text-xs font-bold tracking-widest uppercase">
+                                            <span className="inline-flex px-2.5 py-0.5 rounded-full border border-brand-200 dark:border-brand-900/50 bg-brand-50 dark:bg-brand-950/30 text-brand-700 dark:text-brand-300 text-[11px] font-bold tracking-wider uppercase">
                                                 {project.category}
                                             </span>
                                             {userRole === 'student' && (
                                                 <span 
-                                                    className="inline-flex px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-wider border border-emerald-200/50 dark:border-emerald-900/30 cursor-help"
+                                                    className="inline-flex px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-wider border border-emerald-200/50 dark:border-emerald-900/30 cursor-help"
                                                     title="Based on the skills and domain currently in your profile."
                                                 >
                                                     ★ {getMatchScore(project) >= 80 ? 'High Fit' : getMatchScore(project) >= 65 ? 'Good Fit' : 'Partial Fit'}
@@ -467,9 +466,9 @@ const Projects = () => {
                                         {userRole !== 'recruiter' && (
                                             <button
                                                 onClick={(e) => toggleBookmark(e, project.id)}
-                                                className={`p-2 rounded-full backdrop-blur-sm border transition-all duration-300 ${bookmarkedProjectIds.includes(project.id)
-                                                    ? 'bg-brand-500/20 border-brand-500/50 text-brand-500 dark:text-brand-400'
-                                                    : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800 text-slate-300 dark:text-slate-600 hover:text-brand-500'
+                                                className={`p-2 rounded-xl border transition-colors ${bookmarkedProjectIds.includes(project.id)
+                                                    ? 'bg-brand-50 dark:bg-brand-950/30 border-brand-200 dark:border-brand-800 text-brand-600 dark:text-brand-400'
+                                                    : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
                                                     }`}
                                                 aria-label={bookmarkedProjectIds.includes(project.id) ? "Remove bookmark" : "Add bookmark"}
                                             >
@@ -478,13 +477,13 @@ const Projects = () => {
                                         )}
                                     </div>
 
-                                    <h3 className="text-2xl font-bold font-heading text-slate-900 dark:text-white mb-3 group-hover/card:text-transparent group-hover/card:bg-clip-text group-hover/card:bg-gradient-to-r group-hover/card:from-brand-500 group-hover/card:to-purple-500 transition-all duration-300 break-words hyphens-auto">
+                                    <h3 className="text-xl font-bold font-heading text-slate-900 dark:text-white mb-3 group-hover/card:text-brand-600 dark:group-hover/card:text-brand-400 transition-colors break-words hyphens-auto">
                                         {project.title}
                                     </h3>
 
-                                    <div className="flex items-center justify-between gap-3 mb-6">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center font-bold text-sm text-slate-500 border border-slate-200 dark:border-slate-800 shadow-inner">
+                                    <div className="flex items-center justify-between gap-3 mb-5">
+                                        <div className="flex items-center gap-2.5">
+                                            <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-xs text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                                                 {project.company.charAt(0)}
                                             </div>
                                             <span
@@ -494,28 +493,27 @@ const Projects = () => {
                                                         navigate(`/company/${project.recruiterId}`);
                                                     }
                                                 }}
-                                                className="text-slate-600 dark:text-slate-400 font-semibold text-sm hover:text-brand-600 dark:hover:text-brand-400 hover:underline cursor-pointer transition-colors"
+                                                className="text-slate-600 dark:text-slate-400 font-medium text-xs hover:text-brand-600 dark:hover:text-brand-400 hover:underline cursor-pointer transition-colors"
                                             >
                                                 {project.company}
                                             </span>
                                         </div>
-                                        <div className="flex items-center text-xs text-slate-500 dark:text-slate-500 font-medium">
-                                            <Calendar className="w-3.5 h-3.5 mr-1" />
+                                        <div className="flex items-center text-xs text-slate-500 dark:text-slate-400">
+                                            <Calendar className="w-3 h-3 mr-1" />
                                             {timeAgo(project.postedAt)}
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col gap-3 mb-6 flex-grow p-4 rounded-2xl bg-slate-50/50 dark:bg-[#030712]/50 border border-slate-100 dark:border-slate-800/50">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center text-sm text-slate-500 dark:text-slate-400 font-medium">
-                                                <Clock className="w-4 h-4 mr-3 text-brand-500" /> {project.duration}
+                                    <div className="flex flex-col gap-2.5 mb-5 flex-grow p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/60 text-xs">
+                                        <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
+                                            <div className="flex items-center gap-2">
+                                                <Clock className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" /> {project.duration}
                                             </div>
                                         </div>
                                         <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-1.5 px-3 py-1 bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 rounded-lg whitespace-nowrap border border-green-200 dark:border-green-500/20 shadow-sm transition-colors relative overflow-hidden group-hover:border-green-300 dark:group-hover:border-green-500/40">
-                                                <div className="absolute inset-0 bg-green-400/10 dark:bg-green-400/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                                                <Home className="w-4 h-4 relative z-10" />
-                                                <span className="font-medium relative z-10">WFH ({project.type})</span>
+                                            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 rounded-md border border-emerald-200 dark:border-emerald-800 text-[11px] font-semibold">
+                                                <Home className="w-3 h-3" />
+                                                <span>WFH ({project.type})</span>
                                             </div>
                                         </div>
                                         <div className="flex items-center justify-between">

@@ -13,9 +13,6 @@ import { useTheme } from '../contexts/ThemeContext';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const [isScrolled, setIsScrolled] = useState(false);
-    const [isVisible, setIsVisible] = useState(true);
-    const [lastScrollY, setLastScrollY] = useState(0);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [showStatusMenu, setShowStatusMenu] = useState(false);
     const [showNotificationCenter, setShowNotificationCenter] = useState(false);
@@ -81,40 +78,16 @@ const Navbar = () => {
         }
     };
 
-    useEffect(() => {
-        const handleScroll = () => {
-            const currentScrollY = window.scrollY;
-
-            // Handle background styling
-            setIsScrolled(currentScrollY > 20);
-
-            // Handle hide/show based on scroll direction
-            if (currentScrollY > lastScrollY && currentScrollY > 100) {
-                // Scrolling down past 100px - hide navbar
-                setIsVisible(false);
-                // Also close mobile menu if it's open
-                if (isOpen) setIsOpen(false);
-            } else {
-                // Scrolling up - show navbar
-                setIsVisible(true);
-            }
-
-            setLastScrollY(currentScrollY);
-        };
-
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [lastScrollY, isOpen]);
-
     return (
-        <nav className={`fixed w-full left-0 right-0 z-[100] transition-all duration-500 ${isVisible ? 'translate-y-0' : '-translate-y-full'} ${isScrolled ? 'top-2 sm:top-6 px-4 md:px-8' : 'top-0 px-0'}`}>
-            <div className={`mx-auto transition-all duration-700 ${isScrolled ? 'max-w-5xl glass rounded-full shadow-2xl shadow-brand-500/10 border border-white/40 dark:border-slate-700/60 px-4 md:px-6' : 'max-w-7xl bg-transparent border-transparent px-4 sm:px-6 lg:px-8'}`}>
-                <div className={`flex justify-between items-center transition-all duration-500 ${isScrolled ? 'h-16' : 'h-24 md:h-28'}`}>
+        <nav className="sticky top-0 w-full z-[100] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors duration-200">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex justify-between items-center h-16">
                     <Link
                         to={isAuthenticated ? (userRole === 'recruiter' ? '/dashboard/recruiter' : '/projects') : '/'}
-                        className="flex-shrink-0 flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity"
+                        className="flex-shrink-0 flex items-center gap-2.5 cursor-pointer hover:opacity-90 transition-opacity"
+                        aria-label="ProjectMatch Home"
                     >
-                        <div className={`flex items-center justify-center transition-all duration-500 ${isScrolled ? 'w-8 h-8' : 'w-10 h-10'}`}>
+                        <div className="flex items-center justify-center w-8 h-8">
                             <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
                                 {/* Left Chevron (Dark Navy / White in dark mode) */}
                                 <path d="M12 16 L4 8 H12 L20 16 L12 24 H4 L12 16 Z" fill="currentColor" className="text-slate-900 dark:text-white" />
@@ -122,7 +95,7 @@ const Navbar = () => {
                                 <path d="M22 16 L14 8 H22 L30 16 L22 24 H14 L22 16 Z" fill="#4F46E5" />
                             </svg>
                         </div>
-                        <span className={`font-heading tracking-tight text-slate-900 dark:text-white transition-all duration-500 ${isScrolled ? 'text-xl' : 'text-2xl md:text-3xl'}`}>
+                        <span className="font-heading tracking-tight text-slate-900 dark:text-white text-xl">
                             <span className="font-medium">Project</span><span className="font-bold">Match</span>
                         </span>
                     </Link>

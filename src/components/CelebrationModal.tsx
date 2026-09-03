@@ -44,32 +44,32 @@ export default function CelebrationModal({ isOpen, onClose, title, message, prim
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4" role="dialog" aria-modal="true">
             <div
                 className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity animate-in fade-in duration-300"
                 onClick={onClose}
             />
 
-            <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-8 max-w-md w-full mx-auto relative z-10 shadow-2xl shadow-brand-500/10 border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-300 text-center">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 max-w-md w-full mx-auto relative z-10 shadow-xl border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200 text-center">
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+                    aria-label="Close dialog"
+                    className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
                 >
                     <X className="w-5 h-5" />
                 </button>
 
-                <div className="w-24 h-24 mx-auto mb-6 relative">
-                    <div className="absolute inset-0 bg-brand-500/20 blur-xl rounded-full animate-pulse"></div>
-                    <div className="w-full h-full bg-gradient-to-br from-brand-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg shadow-brand-500/30 relative z-10 text-white">
-                        {icon || <PartyPopper className="w-12 h-12" />}
+                <div className="w-20 h-20 mx-auto mb-6 relative">
+                    <div className="w-full h-full bg-brand-600 dark:bg-brand-500 rounded-2xl flex items-center justify-center shadow-sm text-white">
+                        {icon || <PartyPopper className="w-10 h-10" />}
                     </div>
                 </div>
 
-                <h3 className="text-3xl font-black font-heading tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-purple-600 mb-3">
+                <h3 className="text-2xl font-bold font-heading tracking-tight text-slate-900 dark:text-white mb-2">
                     {title}
                 </h3>
 
-                <p className="text-slate-600 dark:text-slate-300 mb-8 text-lg font-medium">
+                <p className="text-slate-600 dark:text-slate-300 mb-8 text-base font-normal">
                     {message}
                 </p>
 
